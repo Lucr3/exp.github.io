@@ -37,6 +37,15 @@ async function initApp() {
 
     // 4. Renderizza i Grafici
 
+    // Carica e renderizza il grafico degli eventi di violenza (chart1)
+    try {
+        const chartModule = await import('./charts/chart1.js');
+        if (chartModule && typeof chartModule.renderViolenceTimeline === 'function') {
+            chartModule.renderViolenceTimeline('inject-chart-1');
+        }
+    } catch (err) {
+        console.warn('Errore caricamento chart1:', err);
+    }
 
     console.log("App Pronta.");
 }
