@@ -12,6 +12,7 @@ async function initApp() {
     await Promise.all([
         loadHtml('navbar-container', 'html/components/navbar.html'),
         loadHtml('intro-container', 'html/components/intro.html'),
+        loadHtml('about-container', 'html/components/about.html'),
         loadHtml('footer-container', 'html/components/footer.html')
     ]);
 
