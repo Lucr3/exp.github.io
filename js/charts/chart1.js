@@ -1,6 +1,4 @@
 // js/charts/chart1.js
-// Render a line chart with total political violence events in Yemen per year.
-// It reads the Excel file `number_of_political_violence_events_by_country-year_as-of-12Dec2025.xlsx` from /datasets
 
 export async function renderViolenceTimeline(containerId) {
     const container = document.getElementById(containerId);
