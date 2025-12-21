@@ -15,6 +15,15 @@ async function initApp() {
         loadHtml('footer-container', 'html/components/footer.html')
     ]);
 
+    // Pulsante logo: scroll-to-top
+    const logoBtn = document.getElementById('logo-button');
+    if (logoBtn) {
+        logoBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
     // 3. Gestione Eventi Globali (es. Tema Scuro/Chiaro)
     const themeBtn = document.getElementById('theme-toggle');
     if(themeBtn) {
