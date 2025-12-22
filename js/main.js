@@ -1,20 +1,29 @@
 // js/main.js
 import { loadHtml } from './utils/domLoader.js';
 import { loadCSV } from './utils/dataLoader.js'; 
-//esempio: import { renderCivilianDeathsChart } from './charts/Chart1.js';
+import { renderGraph } from './utils/domLoader.js';
+import { renderHeatmap } from './charts/heatmap.js';
 
-async function initApp() {
-    console.log("Inizializzazione");
+async function init() {
 
     // 1. dati
+    let datasets = {
+        WarDeaths: await loadCSV("yemen_deaths_in_armed_conflicts.csv")
+
+    }
+    
   
-    // 2. HTML (Componenti + Blocchi Grafici)
+    // 2. HTML 
     await Promise.all([
         loadHtml('navbar-container', 'html/components/navbar.html'),
         loadHtml('intro-container', 'html/components/intro.html'),
+        loadHtml('chapter1-container', 'html/components/chapter1.html'),
         loadHtml('about-container', 'html/components/about.html'),
         loadHtml('footer-container', 'html/components/footer.html')
     ]);
+
+    // Carica il grafico dentro chapter1
+    await loadHtml('heatmap-container', 'html/charts/heatmap.html');
 
     // Pulsante logo: scroll-to-top
     const logoBtn = document.getElementById('logo-button');
@@ -25,7 +34,7 @@ async function initApp() {
         });
     }
 
-    // 3. Gestione Eventi Globali (es. Tema Scuro/Chiaro)
+    // 3. Tema Scuro/Chiaro
     const themeBtn = document.getElementById('theme-toggle');
     if(themeBtn) {
         themeBtn.addEventListener('click', () => {
@@ -36,18 +45,10 @@ async function initApp() {
     }
 
     // 4. Renderizza i Grafici
+    renderGraph('heatmap-render', renderHeatmap, datasets);
 
-    // Carica e renderizza il grafico degli eventi di violenza (chart1)
-    try {
-        const chartModule = await import('./charts/chart1.js');
-        if (chartModule && typeof chartModule.renderViolenceTimeline === 'function') {
-            chartModule.renderViolenceTimeline('inject-chart-1');
-        }
-    } catch (err) {
-        console.warn('Errore caricamento chart1:', err);
-    }
 
-    console.log("App Pronta.");
+
 }
 
-document.addEventListener('DOMContentLoaded', initApp);
+document.addEventListener('DOMContentLoaded', init);
