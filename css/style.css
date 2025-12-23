@@ -82,6 +82,10 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 var(--spacing-lg);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* ===== HEADER E NAVBAR ===== */
@@ -100,7 +104,8 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: var(--spacing-md) var(--spacing-lg);
-    max-width: 1400px;
+    max-width: 100%;
+    width: 100%;
     margin: 0 auto;
 }
 
@@ -218,7 +223,11 @@ header {
 
 /* ===== SEZIONI ===== */
 .section {
-    padding: var(--spacing-xl) 0;
+    padding: var(--spacing-xl) var(--spacing-lg);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .section:first-of-type {
@@ -272,6 +281,9 @@ header {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-lg);
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 /* ===== CONTAINER GRAFICO ===== */
@@ -709,7 +721,12 @@ footer {
 .symbolic-map-wrapper {
     position: relative;
     width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #symbolic-zoom-controls {
