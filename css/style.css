@@ -699,6 +699,45 @@ footer {
 }
 
 /* ===== RESPONSIVE ===== */
+/* ===== SYMBOLIC MAP RESPONSIVENESS ===== */
+#symbolic-map-svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.symbolic-map-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+#symbolic-zoom-controls {
+    position: absolute;
+    left: 10px;
+    bottom: 20px;
+    z-index: 1000;
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    display: flex;
+}
+
+#year-display {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: var(--giallo);
+    font-size: 2rem;
+    font-weight: bold;
+    z-index: 999;
+    white-space: nowrap;
+}
+
 @media (max-width: 768px) {
     .control-row {
         flex-direction: column;
@@ -707,6 +746,22 @@ footer {
     
     .slider {
         width: 100%;
+    }
+    
+    #symbolic-map-svg {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    #year-display {
+        bottom: 15px;
+        right: 15px;
+        padding: 10px 15px;
+        font-size: 1.5rem;
+    }
+    
+    #symbolic-zoom-controls {
+        display: none;
     }
 
     .team-grid {
