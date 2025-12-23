@@ -19,7 +19,16 @@ export function renderSymbolMap(container, datasets) {
     const HEIGHT = 500 - MARGIN.top - MARGIN.bottom;
     const VIOLENT_TYPES = ['battles', 'explosions', 'riots', 'violence against civilians'];
 
-    const TOOLTIP_CONFIG = {
+    let animationInterval = null;
+    let isPlaying = false;
+    const yearTrails = [];
+    let lastYearIndex = 0;
+
+    const tooltip = d3.select('#symbolic-map-tooltip').empty() 
+        ? d3.select('body').append('div').attr('id', 'symbolic-map-tooltip')
+        : d3.select('#symbolic-map-tooltip');
+
+    Object.assign(tooltip.node().style, {
         position: 'fixed',
         background: 'rgba(0, 0, 0, 0.95)',
         color: '#fff',
@@ -28,19 +37,6 @@ export function renderSymbolMap(container, datasets) {
         fontSize: '12px',
         zIndex: '10000',
         maxWidth: '250px'
-    };
-
-    let animationInterval = null;
-    let isPlaying = false;
-    const yearTrails = [];
-
-    let tooltip = d3.select('#symbolic-map-tooltip');
-    if (tooltip.empty()) {
-        tooltip = d3.select('body').append('div').attr('id', 'symbolic-map-tooltip');
-    }
-
-    Object.entries(TOOLTIP_CONFIG).forEach(([key, value]) => {
-        tooltip.style(key, value);
     });
 
     svg.selectAll('g.chart-root, rect.background').remove();
@@ -60,12 +56,10 @@ export function renderSymbolMap(container, datasets) {
 
         svg.call(zoom);
 
-        const zoomActions = [
+        [
             { selector: '#symbolic-map-zoom-in', scale: 1.3 },
             { selector: '#symbolic-map-zoom-out', scale: 0.7 }
-        ];
-
-        zoomActions.forEach(({ selector, scale }) => {
+        ].forEach(({ selector, scale }) => {
             root.select(selector).on('click', () => 
                 svg.transition().duration(300).call(zoom.scaleBy, scale)
             );
@@ -79,6 +73,7 @@ export function renderSymbolMap(container, datasets) {
     setupZoom();
 
     const extractYear = str => +str.split('-')[2] || null;
+    const formatNum = d3.format(',');
 
     const filteredData = datasets.AggregatedData.filter(d => {
         const eventType = (d.EVENT_TYPE || '').toLowerCase().trim();
@@ -104,8 +99,7 @@ export function renderSymbolMap(container, datasets) {
             locationData.set(location, { location, latitude: lat, longitude: lon, years: {} });
         }
 
-        const loc = locationData.get(location);
-        loc.years[year] = (loc.years[year] || 0) + deaths;
+        locationData.get(location).years[year] = (locationData.get(location).years[year] || 0) + deaths;
     });
 
     const locationArray = Array.from(locationData.values());
@@ -120,6 +114,7 @@ export function renderSymbolMap(container, datasets) {
 
     yearSlider.attr('min', 0).attr('max', years.length - 1).attr('value', years.length - 1);
     yearLabel.text(years[years.length - 1]);
+    lastYearIndex = years.length - 1;
 
     const projection = d3.geoMercator()
         .center([48, 14.5])
@@ -137,8 +132,6 @@ export function renderSymbolMap(container, datasets) {
         .domain([0, maxDeaths])
         .range([2, 35]);
 
-    const formatNum = d3.format(',');
-
     const showTooltip = (event, html) => {
         tooltip.html(html).style('display', 'block').style('opacity', 1);
 
@@ -154,12 +147,19 @@ export function renderSymbolMap(container, datasets) {
 
     const hideTooltip = () => tooltip.style('opacity', 0).style('display', 'none');
 
+    const removeTrails = (fromIndex) => {
+        for (let i = fromIndex; i < yearTrails.length; i++) {
+            trailsGroup.selectAll(`circle.trail-${i}`).remove();
+        }
+        yearTrails.length = fromIndex;
+    };
+
     const renderLegend = () => {
         const breaks = d3.range(6).map(i => Math.round(i / 5 * maxDeaths));
-        const legendData = breaks.map((b, i) => {
-            let label = i === 0 ? '0' : i === 5 ? `${formatNum(b)}+` : `${formatNum(breaks[i - 1] + 1)}–${formatNum(b)}`;
-            return { label, color: colorScale(i === 0 ? 0 : Math.round((breaks[i - 1] + b) / 2)) };
-        });
+        const legendData = breaks.map((b, i) => ({
+            label: i === 0 ? '0' : i === 5 ? `${formatNum(b)}+` : `${formatNum(breaks[i - 1] + 1)}–${formatNum(b)}`,
+            color: colorScale(i === 0 ? 0 : Math.round((breaks[i - 1] + b) / 2))
+        }));
 
         const legend = svg.append('g').attr('class', 'legend');
         const items = legend.selectAll().data(legendData).enter().append('g').attr('class', 'legend-item');
@@ -217,8 +217,8 @@ export function renderSymbolMap(container, datasets) {
                         .attr('class', `trail trail-${trail.index}`)
                         .attr('cx', d => d.x)
                         .attr('cy', d => d.y)
-                        .attr('r', d => radiusScale(d.deaths) * 0.6)
-                        .attr('fill', d => colorScale(d.deaths))
+                        .attr('r', d => d.radius)
+                        .attr('fill', d => d.color)
                         .attr('opacity', 0.3);
                 });
 
@@ -261,12 +261,26 @@ export function renderSymbolMap(container, datasets) {
                     .style('fill', '#fff').attr('opacity', 0.7)
                     .text(selectedYear);
 
-                yearTrails.push({ index: yearIndex, data: bubbleData });
+                yearTrails.push({ 
+                    index: yearIndex, 
+                    data: bubbleData.map(d => ({
+                        ...d,
+                        radius: radiusScale(d.deaths),
+                        color: colorScale(d.deaths)
+                    }))
+                });
             };
 
             update(years.length - 1);
 
-            yearSlider.on('input', function() { update(+this.value); });
+            yearSlider.on('input', function() { 
+                const newIndex = +this.value;
+                if (newIndex < lastYearIndex && newIndex < yearTrails.length) {
+                    removeTrails(newIndex);
+                }
+                lastYearIndex = newIndex;
+                update(newIndex); 
+            });
 
             speedSlider.on('input', function() {
                 const speed = +this.value;
@@ -281,6 +295,9 @@ export function renderSymbolMap(container, datasets) {
                 animationInterval = setInterval(() => {
                     let idx = +yearSlider.property('value');
                     idx = (idx + 1) % years.length;
+                    if (idx === 0) {
+                        removeTrails(0);
+                    }
                     yearSlider.property('value', idx);
                     update(idx);
                 }, speed);
