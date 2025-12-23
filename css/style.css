@@ -721,7 +721,7 @@ footer {
 .symbolic-map-wrapper {
     position: relative;
     width: 960px;
-    height: 500px;
+    aspect-ratio: 960 / 500;
     margin: 0 auto;
     overflow: hidden;
     display: flex;
