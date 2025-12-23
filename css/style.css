@@ -722,3 +722,10 @@ footer {
         font-size: 1.5rem;
     }
 }
+
+/* ===== NOTE UTILITY FOR CARDS ===== */
+.card-narrow .card-note {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
