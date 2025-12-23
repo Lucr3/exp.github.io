@@ -107,6 +107,7 @@ export function renderSymbolMap(container, datasets) {
         .map(Number)
         .sort((a, b) => a - b);
 
+
     yearSlider.attr('min', 0).attr('max', years.length - 1).attr('value', years.length - 1);
     yearLabel.text(years[years.length - 1]);
     lastYearIndex = years.length - 1;
@@ -121,7 +122,7 @@ export function renderSymbolMap(container, datasets) {
 
     const colorScale = d3.scaleSequential()
         .domain([0, maxDeaths])
-        .interpolator(d3.interpolateRgb('#F7C590', '#d63031'));
+        .interpolator(d3.interpolateRgb('#ffeaa7', '#d63031'));
 
     const radiusScale = d3.scaleSqrt()
         .domain([0, maxDeaths])
@@ -150,9 +151,9 @@ export function renderSymbolMap(container, datasets) {
     };
 
     const renderLegend = () => {
-        const breaks = d3.range(6).map(i => Math.round(i / 5 * maxDeaths));
+        const breaks = d3.range(1, 6).map(i => Math.round(i / 5 * maxDeaths));
         const legendData = breaks.map((b, i) => ({
-            label: i === 0 ? '0' : i === 5 ? `${formatNum(b)}+` : `${formatNum(breaks[i - 1] + 1)}–${formatNum(b)}`,
+            label: i === 0 ? `1–${formatNum(b)}` : i === breaks.length - 1 ? `${formatNum(breaks[i - 1] + 1)}+` : `${formatNum(breaks[i - 1] + 1)}–${formatNum(b)}`,
             color: colorScale(b)
         }));
 
