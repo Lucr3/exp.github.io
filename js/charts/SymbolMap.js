@@ -158,7 +158,7 @@ export function renderSymbolMap(container, datasets) {
         const breaks = d3.range(6).map(i => Math.round(i / 5 * maxDeaths));
         const legendData = breaks.map((b, i) => ({
             label: i === 0 ? '0' : i === 5 ? `${formatNum(b)}+` : `${formatNum(breaks[i - 1] + 1)}–${formatNum(b)}`,
-            color: colorScale(i === 0 ? 0 : Math.round((breaks[i - 1] + b) / 2))
+            color: colorScale(b)
         }));
 
         const legend = svg.append('g').attr('class', 'legend');
