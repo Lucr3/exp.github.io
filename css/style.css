@@ -725,18 +725,7 @@ footer {
     display: flex;
 }
 
-#year-display {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    padding: 12px 20px;
-    border-radius: 8px;
-    color: var(--giallo);
-    font-size: 2rem;
-    font-weight: bold;
-    z-index: 999;
-    white-space: nowrap;
-}
+
 
 @media (max-width: 768px) {
     .control-row {

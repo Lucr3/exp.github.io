@@ -1,7 +1,6 @@
 export function renderSymbolMap(container, datasets) {
-    // Early returns for invalid state
     if (!container || !datasets?.AggregatedData) {
-        console.error('Missing container or AggregatedData dataset');
+        console.error('Missing container or AggregatedData');
         return;
     }
 
@@ -9,91 +8,76 @@ export function renderSymbolMap(container, datasets) {
     const svg = root.select('#symbolic-map-svg');
     const yearSlider = root.select('#symbolic-map-year-slider');
     const yearLabel = root.select('#symbolic-map-year-slider-value');
-    const yearDisplayValue = root.select('#year-display-value');
     const playBtn = root.select('#symbolic-map-play-btn');
     const speedSlider = root.select('#symbolic-map-speed-slider');
     const speedLabel = root.select('#symbolic-map-speed-value');
-    const zoomInBtn = root.select('#symbolic-map-zoom-in');
-    const zoomOutBtn = root.select('#symbolic-map-zoom-out');
-    const zoomResetBtn = root.select('#symbolic-map-zoom-reset');
 
-    if (svg.empty() || yearSlider.empty()) {
-        console.warn('Required SVG elements not found');
-        return;
-    }
+    if (svg.empty() || yearSlider.empty()) return;
 
-    // Configuration
     const MARGIN = { top: 10, right: 20, bottom: 20, left: 20 };
     const WIDTH = 960 - MARGIN.left - MARGIN.right;
     const HEIGHT = 500 - MARGIN.top - MARGIN.bottom;
     const VIOLENT_TYPES = ['battles', 'explosions', 'riots', 'violence against civilians'];
 
+    const TOOLTIP_CONFIG = {
+        position: 'fixed',
+        background: 'rgba(0, 0, 0, 0.95)',
+        color: '#fff',
+        padding: '10px 14px',
+        borderRadius: '6px',
+        fontSize: '12px',
+        zIndex: '10000',
+        maxWidth: '250px'
+    };
+
     let animationInterval = null;
     let isPlaying = false;
-    let previousYearIndex = -1;
     const yearTrails = [];
 
-    // Setup tooltip
     let tooltip = d3.select('#symbolic-map-tooltip');
     if (tooltip.empty()) {
         tooltip = d3.select('body').append('div').attr('id', 'symbolic-map-tooltip');
     }
 
-    tooltip
-        .classed('chart-tooltip', true)
-        .style('position', 'fixed')
-        .style('pointer-events', 'none')
-        .style('background', 'rgba(0, 0, 0, 0.95)')
-        .style('color', '#fff')
-        .style('padding', '10px 14px')
-        .style('border-radius', '6px')
-        .style('font-size', '12px')
-        .style('z-index', '10000')
-        .style('max-width', '250px')
-        .style('display', 'none')
-        .style('opacity', 0);
+    Object.entries(TOOLTIP_CONFIG).forEach(([key, value]) => {
+        tooltip.style(key, value);
+    });
 
-    // Setup SVG
-    svg.attr('width', 960).attr('height', 500).style('max-width', '100%').style('height', 'auto');
     svg.selectAll('g.chart-root, rect.background').remove();
-    
-    svg.append('rect')
-        .attr('class', 'background')
-        .attr('width', 960)
-        .attr('height', 500)
-        .attr('fill', '#2d3436');
+    svg.append('rect').attr('class', 'background').attr('width', 960).attr('height', 500).attr('fill', '#2d3436');
 
-    const g = svg.append('g')
-        .attr('class', 'chart-root')
-        .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
+    const g = svg.append('g').attr('class', 'chart-root').attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
     const mapGroup = g.append('g').attr('class', 'map-group');
     const mapLayer = mapGroup.append('g').attr('class', 'map-layer');
     const trailsGroup = mapGroup.append('g').attr('class', 'trails-group');
     const bubblesGroup = mapGroup.append('g').attr('class', 'bubbles-group');
 
-    // Setup zoom
-    const zoom = d3.zoom()
-        .scaleExtent([1, 8])
-        .translateExtent([[0, 0], [WIDTH, HEIGHT]])
-        .on('zoom', event => mapGroup.attr('transform', event.transform));
+    const setupZoom = () => {
+        const zoom = d3.zoom()
+            .scaleExtent([1, 8])
+            .translateExtent([[0, 0], [WIDTH, HEIGHT]])
+            .on('zoom', event => mapGroup.attr('transform', event.transform));
 
-    svg.call(zoom);
+        svg.call(zoom);
 
-    // Zoom controls
-    [
-        { btn: zoomInBtn, scale: 1.3 },
-        { btn: zoomOutBtn, scale: 0.7 }
-    ].forEach(({ btn, scale }) => {
-        if (!btn.empty()) btn.on('click', () => svg.transition().duration(300).call(zoom.scaleBy, scale));
-    });
+        const zoomActions = [
+            { selector: '#symbolic-map-zoom-in', scale: 1.3 },
+            { selector: '#symbolic-map-zoom-out', scale: 0.7 }
+        ];
 
-    if (!zoomResetBtn.empty()) {
-        zoomResetBtn.on('click', () => {
-            svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity.translate(0, 0).scale(1));
+        zoomActions.forEach(({ selector, scale }) => {
+            root.select(selector).on('click', () => 
+                svg.transition().duration(300).call(zoom.scaleBy, scale)
+            );
         });
-    }
 
-    // Parse and filter data
+        root.select('#symbolic-map-zoom-reset').on('click', () => 
+            svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity.translate(0, 0).scale(1))
+        );
+    };
+
+    setupZoom();
+
     const extractYear = str => +str.split('-')[2] || null;
 
     const filteredData = datasets.AggregatedData.filter(d => {
@@ -102,11 +86,10 @@ export function renderSymbolMap(container, datasets) {
     });
 
     if (!filteredData.length) {
-        console.error('No violent events data found');
+        console.error('No violent events found');
         return;
     }
 
-    // Aggregate by location and year
     const locationData = new Map();
     filteredData.forEach(d => {
         const year = extractYear(d.WEEK);
@@ -126,7 +109,9 @@ export function renderSymbolMap(container, datasets) {
     });
 
     const locationArray = Array.from(locationData.values());
-    const years = [...new Set(locationArray.flatMap(loc => Object.keys(loc.years)))].map(Number).sort((a, b) => a - b);
+    const years = [...new Set(locationArray.flatMap(loc => Object.keys(loc.years)))]
+        .map(Number)
+        .sort((a, b) => a - b);
 
     if (!years.length) {
         console.error('No valid years found');
@@ -136,7 +121,6 @@ export function renderSymbolMap(container, datasets) {
     yearSlider.attr('min', 0).attr('max', years.length - 1).attr('value', years.length - 1);
     yearLabel.text(years[years.length - 1]);
 
-    // Setup projection and scales
     const projection = d3.geoMercator()
         .center([48, 14.5])
         .scale(3000)
@@ -155,42 +139,38 @@ export function renderSymbolMap(container, datasets) {
 
     const formatNum = d3.format(',');
 
-    // Helper: show/hide tooltip
     const showTooltip = (event, html) => {
         tooltip.html(html).style('display', 'block').style('opacity', 1);
 
         let x = event.clientX + 14;
         let y = event.clientY + 16;
         const rect = tooltip.node().getBoundingClientRect();
-        const vw = window.innerWidth;
-        const vh = window.innerHeight;
 
-        if (x + rect.width > vw - 8) x = event.clientX - rect.width - 14;
-        if (y + rect.height > vh - 8) y = event.clientY - rect.height - 14;
+        if (x + rect.width > window.innerWidth - 8) x = event.clientX - rect.width - 14;
+        if (y + rect.height > window.innerHeight - 8) y = event.clientY - rect.height - 14;
 
         tooltip.style('left', `${x}px`).style('top', `${y}px`);
     };
 
     const hideTooltip = () => tooltip.style('opacity', 0).style('display', 'none');
 
-    // Legend rendering
     const renderLegend = () => {
         const breaks = d3.range(6).map(i => Math.round(i / 5 * maxDeaths));
-        const legendData = breaks.map((b, i) => ({
-            value: i === 0 ? '0' : i === 5 ? `${d3.format(',')(b)}+` : `${d3.format(',')(breaks[i - 1] + 1)}–${d3.format(',')(b)}`,
-            color: colorScale(i === 0 ? 0 : Math.round((breaks[i - 1] + b) / 2))
-        }));
+        const legendData = breaks.map((b, i) => {
+            let label = i === 0 ? '0' : i === 5 ? `${formatNum(b)}+` : `${formatNum(breaks[i - 1] + 1)}–${formatNum(b)}`;
+            return { label, color: colorScale(i === 0 ? 0 : Math.round((breaks[i - 1] + b) / 2)) };
+        });
 
         const legend = svg.append('g').attr('class', 'legend');
         const items = legend.selectAll().data(legendData).enter().append('g').attr('class', 'legend-item');
 
-        items.append('rect').attr('width', 16).attr('height', 16).attr('fill', d => d.color).attr('stroke', '#fff').attr('stroke-width', 0.5);
-        items.append('text').attr('x', 24).attr('y', 8).attr('dominant-baseline', 'middle').style('font-size', '12px').style('fill', '#fff').text(d => d.value);
+        items.append('rect').attr('width', 16).attr('height', 16).attr('fill', d => d.color);
+        items.append('text').attr('x', 24).attr('y', 8).attr('dominant-baseline', 'middle')
+            .style('font-size', '12px').style('fill', '#fff').text(d => d.label);
 
         let lx = 0;
         items.each(function() {
-            const bbox = d3.select(this).select('text').node().getBBox();
-            const width = 16 + 8 + bbox.width;
+            const width = 16 + 8 + d3.select(this).select('text').node().getBBox().width;
             d3.select(this).attr('transform', `translate(${lx}, 0)`);
             lx += width + 30;
         });
@@ -205,16 +185,10 @@ export function renderSymbolMap(container, datasets) {
             const update = yearIndex => {
                 const selectedYear = years[yearIndex];
                 yearLabel.text(selectedYear);
-                yearDisplayValue.text(selectedYear);
+                root.select('#year-display').text(selectedYear);
 
-                // Reset trails on restart
-                if (yearIndex < previousYearIndex) {
-                    trailsGroup.selectAll('circle.bubble-trail').remove();
-                    yearTrails.length = 0;
-                }
-                previousYearIndex = yearIndex;
+                if (yearIndex < yearTrails.length) yearTrails.length = yearIndex;
 
-                // Render base map
                 mapLayer.selectAll('path.country')
                     .data(topo.features)
                     .join('path')
@@ -224,54 +198,50 @@ export function renderSymbolMap(container, datasets) {
                     .attr('stroke', '#4a5459')
                     .attr('stroke-width', 0.5);
 
-                // Current year bubbles
                 const bubbleData = locationArray
                     .filter(loc => loc.years[selectedYear])
-                    .map(loc => ({
-                        location: loc.location,
-                        deaths: loc.years[selectedYear],
-                        x: projection([loc.longitude, loc.latitude])[0],
-                        y: projection([loc.longitude, loc.latitude])[1]
-                    }))
+                    .map(loc => {
+                        const [x, y] = projection([loc.longitude, loc.latitude]);
+                        return {
+                            location: loc.location,
+                            deaths: loc.years[selectedYear],
+                            x, y
+                        };
+                    })
                     .filter(d => !isNaN(d.x) && !isNaN(d.y));
 
-                // Render previous year trails
                 yearTrails.forEach(trail => {
-                    trailsGroup.selectAll(`circle.bubble-trail-${trail.index}`)
+                    trailsGroup.selectAll(`circle.trail-${trail.index}`)
                         .data(trail.data)
                         .join('circle')
-                        .attr('class', `bubble-trail bubble-trail-${trail.index}`)
+                        .attr('class', `trail trail-${trail.index}`)
                         .attr('cx', d => d.x)
                         .attr('cy', d => d.y)
-                        .attr('r', d => radiusScale(d.deaths))
+                        .attr('r', d => radiusScale(d.deaths) * 0.6)
                         .attr('fill', d => colorScale(d.deaths))
                         .attr('opacity', 0.3);
                 });
 
-                // Render current bubbles
-                const bubbles = bubblesGroup.selectAll('circle.bubble')
-                    .data(bubbleData, d => d.location)
-                    .join(
-                        enter => enter.append('circle')
-                            .attr('class', 'bubble')
-                            .attr('cx', d => d.x)
-                            .attr('cy', d => d.y)
-                            .attr('r', 0)
-                            .attr('fill', d => colorScale(d.deaths))
-                            .attr('opacity', 0.8)
-                            .style('cursor', 'pointer')
-                            .call(sel => sel.transition().duration(500).attr('r', d => radiusScale(d.deaths))),
-                        update => update
-                            .call(sel => sel.transition().duration(500).attr('cx', d => d.x).attr('cy', d => d.y).attr('r', d => radiusScale(d.deaths)).attr('fill', d => colorScale(d.deaths))),
-                        exit => exit.call(sel => sel.transition().duration(300).attr('r', 0).remove())
-                    );
-
-                // Tooltip handlers
                 const tooltipHtml = (d, year) => 
                     `<div style="text-align: center;"><strong>${d.location}</strong></div>` +
                     `<strong>Year:</strong> ${year}<br/><strong>Deaths:</strong> ${formatNum(d.deaths)}`;
 
-                bubbles
+                bubblesGroup.selectAll('circle.bubble')
+                    .data(bubbleData, d => d.location)
+                    .join(
+                        enter => enter.append('circle')
+                            .attr('class', 'bubble')
+                            .attr('cx', d => d.x).attr('cy', d => d.y).attr('r', 0)
+                            .attr('fill', d => colorScale(d.deaths)).attr('opacity', 0.8)
+                            .style('cursor', 'pointer')
+                            .call(sel => sel.transition().duration(500).attr('r', d => radiusScale(d.deaths))),
+                        update => update
+                            .call(sel => sel.transition().duration(500)
+                                .attr('cx', d => d.x).attr('cy', d => d.y)
+                                .attr('r', d => radiusScale(d.deaths))
+                                .attr('fill', d => colorScale(d.deaths))),
+                        exit => exit.call(sel => sel.transition().duration(300).attr('r', 0).remove())
+                    )
                     .on('mouseenter', (event, d) => {
                         showTooltip(event, tooltipHtml(d, selectedYear));
                         d3.select(event.currentTarget).attr('opacity', 1);
@@ -282,20 +252,15 @@ export function renderSymbolMap(container, datasets) {
                         d3.select(event.currentTarget).attr('opacity', 0.8);
                     });
 
-                // Year label
                 g.selectAll('.year-label').remove();
                 g.append('text')
                     .attr('class', 'year-label')
-                    .attr('x', WIDTH - 10)
-                    .attr('y', HEIGHT - 10)
+                    .attr('x', WIDTH - 10).attr('y', HEIGHT - 10)
                     .attr('text-anchor', 'end')
-                    .attr('font-size', 48)
-                    .attr('font-weight', 'bold')
-                    .style('fill', '#fff')
-                    .attr('opacity', 0.7)
+                    .attr('font-size', 48).attr('font-weight', 'bold')
+                    .style('fill', '#fff').attr('opacity', 0.7)
                     .text(selectedYear);
 
-                // Save trail for next iteration
                 yearTrails.push({ index: yearIndex, data: bubbleData });
             };
 
@@ -322,27 +287,23 @@ export function renderSymbolMap(container, datasets) {
             };
 
             playBtn.on('click', function() {
+                isPlaying = !isPlaying;
                 if (isPlaying) {
-                    clearInterval(animationInterval);
-                    animationInterval = null;
-                    isPlaying = false;
-                    playBtn.html('<i class="bi bi-play-fill"></i> Play').classed('btn-primary', true).classed('btn-danger', false);
-                } else {
-                    isPlaying = true;
                     const speed = +speedSlider.property('value');
                     playBtn.html('<i class="bi bi-stop-fill"></i> Stop').classed('btn-primary', false).classed('btn-danger', true);
                     startAnimation(speed);
+                } else {
+                    clearInterval(animationInterval);
+                    playBtn.html('<i class="bi bi-play-fill"></i> Play').classed('btn-primary', true).classed('btn-danger', false);
                 }
             });
         })
         .catch(error => {
-            console.error('Error loading GeoJSON:', error);
+            console.error('Error loading map:', error);
             g.append('text')
-                .attr('x', WIDTH / 2)
-                .attr('y', HEIGHT / 2)
+                .attr('x', WIDTH / 2).attr('y', HEIGHT / 2)
                 .attr('text-anchor', 'middle')
-                .attr('font-size', 16)
-                .attr('fill', '#666')
+                .attr('font-size', 16).attr('fill', '#666')
                 .text('Error loading map data');
         });
 }
