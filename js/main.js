@@ -2,13 +2,15 @@
 import { loadHtml } from './utils/domLoader.js';
 import { loadCSV } from './utils/dataLoader.js'; 
 import { renderGraph } from './utils/domLoader.js';
-import { renderHeatmap } from './charts/heatmap.js';
+import { renderSymbolMap } from './charts/SymbolMap.js';
 
 async function init() {
 
     // 1. dati
     let datasets = {
-        WarDeaths: await loadCSV("yemen_deaths_in_armed_conflicts.csv")
+        WarDeaths: await loadCSV("yemen_deaths_in_armed_conflicts.csv"),
+        AggregatedData: await loadCSV("yemen_data_aggregated.csv")
+
 
     }
     
@@ -23,7 +25,7 @@ async function init() {
     ]);
 
     // Carica il grafico dentro chapter1
-    await loadHtml('heatmap-container', 'html/charts/heatmap.html');
+    await loadHtml('SymbolMap-container', 'html/charts/SymbolMap.html');
 
     // Pulsante logo: scroll-to-top
     const logoBtn = document.getElementById('logo-button');
@@ -45,7 +47,7 @@ async function init() {
     }
 
     // 4. Renderizza i Grafici
-    renderGraph('heatmap-render', renderHeatmap, datasets);
+    renderGraph('SymbolMap-render', renderSymbolMap, datasets);
 
 
 
