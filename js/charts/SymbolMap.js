@@ -107,11 +107,6 @@ export function renderSymbolMap(container, datasets) {
         .map(Number)
         .sort((a, b) => a - b);
 
-    if (!years.length) {
-        console.error('No valid years found');
-        return;
-    }
-
     yearSlider.attr('min', 0).attr('max', years.length - 1).attr('value', years.length - 1);
     yearLabel.text(years[years.length - 1]);
     lastYearIndex = years.length - 1;
@@ -126,7 +121,7 @@ export function renderSymbolMap(container, datasets) {
 
     const colorScale = d3.scaleSequential()
         .domain([0, maxDeaths])
-        .interpolator(d3.interpolateRgb('#ffeaa7', '#d63031'));
+        .interpolator(d3.interpolateRgb('#F7C590', '#d63031'));
 
     const radiusScale = d3.scaleSqrt()
         .domain([0, maxDeaths])
