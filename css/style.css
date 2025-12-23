@@ -713,15 +713,15 @@ footer {
 /* ===== RESPONSIVE ===== */
 /* ===== SYMBOLIC MAP RESPONSIVENESS ===== */
 #symbolic-map-svg {
-    max-width: 100%;
+    width: 100%;
     height: auto;
     display: block;
 }
 
 .symbolic-map-wrapper {
     position: relative;
-    width: 100%;
-    max-width: 960px;
+    width: 960px;
+    height: 500px;
     margin: 0 auto;
     overflow: hidden;
     display: flex;
