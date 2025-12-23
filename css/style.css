@@ -9,30 +9,65 @@
     --spacing-xl: 4rem;
     --border-radius: 8px;
     --transition: all 0.3s ease;
-    
+
     --font-heading: 'Roboto Slab', serif;
     --font-body: 'Fira Sans', sans-serif;
-    
-    --blu: #002677;           
-    --giallo: #F4DA40;       
-    --rosso: #C8102E;         
-    --azzurro: #199BFC;       
-    --grigio-scuro: #25282A; 
-    --grigio-chiaro: #D9D9D6; 
+
+    --blu: #002677;
+    --giallo: #F4DA40;
+    --rosso: #C8102E;
+    --azzurro: #199BFC;
+    --grigio-scuro: #25282A;
+    --grigio-chiaro: #D9D9D6;
+
+    /* ===== DISASTER CHART COLORS ===== */
+    /* Group colors */
+    --disaster-natural: #1e88e5;
+    --disaster-technological: #e65100;
+
+    /* Natural disaster types - blue/teal spectrum */
+    --disaster-flood: #0288d1;
+    --disaster-epidemic: #7b1fa2;
+    --disaster-storm: #5c6bc0;
+    --disaster-earthquake: #6d4c41;
+    --disaster-landslide: #00897b;
+    --disaster-volcanic: #d84315;
+
+    /* Technological disaster types - orange/red spectrum */
+    --disaster-transport: #f57c00;
+    --disaster-explosion-industrial: #c62828;
+    --disaster-explosion-misc: #ad1457;
+    --disaster-collapse: #795548;
+    --disaster-fire: #ff5722;
+    --disaster-misc-accident: #607d8b;
+
+    /* Additional chart colors */
+    --chart-color-1: #0288d1;
+    --chart-color-2: #7b1fa2;
+    --chart-color-3: #5c6bc0;
+    --chart-color-4: #6d4c41;
+    --chart-color-5: #00897b;
+    --chart-color-6: #d84315;
+    --chart-color-7: #f57c00;
+    --chart-color-8: #c62828;
+    --chart-color-9: #ad1457;
+    --chart-color-10: #795548;
+    --chart-color-11: #ff5722;
+    --chart-color-12: #607d8b;
 }
 
 /* ===== TEMA SCURO  ===== */
 [data-theme="dark"] {
-    --primary-color: #1a1f2e;           
-    --secondary-color: #0d1117;         
-    --accent-color: var(--blu);   
-    --accent-secondary: var(--giallo); 
-    --accent-alert: var(--rosso); 
-    --title-color: var(--azzurro); 
-    --title-bg: #15181f;               
+    --primary-color: #1a1f2e;
+    --secondary-color: #0d1117;
+    --accent-color: var(--blu);
+    --accent-secondary: var(--giallo);
+    --accent-alert: var(--rosso);
+    --title-color: var(--azzurro);
+    --title-bg: #15181f;
     --text-color: #eaeaea;
     --text-muted: var(--grigio-chiaro);
-    --background-color: var(--grigio-scuro); 
+    --background-color: var(--grigio-scuro);
     --card-background: #1a1f2e;
     --border-color: #3d4555;
     --header-bg: #0d1117;
@@ -43,19 +78,19 @@
 /* ===== TEMA CHIARO ===== */
 [data-theme="light"] {
     --primary-color: #ffffff;
-    --secondary-color: var(--grigio-chiaro); 
-    --accent-color: var(--blu);  
+    --secondary-color: var(--grigio-chiaro);
+    --accent-color: var(--blu);
     --accent-secondary: var(--giallo);
     --accent-alert: var(--rosso);
-    --title-color: var(--blu);  
-    --title-bg: #e8e8e6;               
-    --text-color: var(--grigio-scuro);  
+    --title-color: var(--blu);
+    --title-bg: #e8e8e6;
+    --text-color: var(--grigio-scuro);
     --text-muted: #5a5a5a;
     --background-color: #f5f5f3;
     --card-background: #ffffff;
     --border-color: #d0d0d0;
     --header-bg: #ffffff;
-    --shadow-color: rgba(0, 38, 119, 0.1); 
+    --shadow-color: rgba(0, 38, 119, 0.1);
     --comment-bg: #f8f8f6;
 }
 
@@ -142,7 +177,7 @@ header {
 }
 
 .logo .logo-btn:focus {
-    outline: 3px solid rgba(25,155,252,0.15);
+    outline: 3px solid rgba(25, 155, 252, 0.15);
     border-radius: 4px;
 }
 
@@ -272,7 +307,7 @@ header {
 /* ===== SEZIONI GRAFICI ===== */
 .section-chart {
     padding: var(--spacing-xl) 0;
-    scroll-margin-top: 80px;    
+    scroll-margin-top: 80px;
     background-color: var(--background-color);
 }
 
@@ -298,6 +333,15 @@ header {
 .chart-container:hover {
     box-shadow: 0 10px 30px var(--shadow-color);
     border-color: var(--accent-color);
+}
+
+.chart-container.static {
+    transition: none;
+}
+
+.chart-container.static:hover {
+    box-shadow: none;
+    border-color: var(--border-color);
 }
 
 .chart-header {
@@ -488,15 +532,37 @@ footer p {
     text-align: center;
 }
 
-.mt-1 { margin-top: var(--spacing-sm); }
-.mt-2 { margin-top: var(--spacing-md); }
-.mt-3 { margin-top: var(--spacing-lg); }
-.mt-4 { margin-top: var(--spacing-xl); }
+.mt-1 {
+    margin-top: var(--spacing-sm);
+}
 
-.mb-1 { margin-bottom: var(--spacing-sm); }
-.mb-2 { margin-bottom: var(--spacing-md); }
-.mb-3 { margin-bottom: var(--spacing-lg); }
-.mb-4 { margin-bottom: var(--spacing-xl); }
+.mt-2 {
+    margin-top: var(--spacing-md);
+}
+
+.mt-3 {
+    margin-top: var(--spacing-lg);
+}
+
+.mt-4 {
+    margin-top: var(--spacing-xl);
+}
+
+.mb-1 {
+    margin-bottom: var(--spacing-sm);
+}
+
+.mb-2 {
+    margin-bottom: var(--spacing-md);
+}
+
+.mb-3 {
+    margin-bottom: var(--spacing-lg);
+}
+
+.mb-4 {
+    margin-bottom: var(--spacing-xl);
+}
 
 /* ===== TOOLTIP PER GRAFICI D3.js ===== */
 .tooltip {
@@ -539,7 +605,9 @@ footer p {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* ===== SMOOTH THEME TRANSITION ===== */
@@ -570,6 +638,7 @@ footer {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--accent-color);
 }
+
 /* ===== SECTION ABOUT - TEAM CARDS ===== */
 .section-about {
     padding: var(--spacing-xl) 0;
@@ -664,7 +733,7 @@ footer {
 .social-icon {
     padding: var(--spacing-sm) var(--spacing-md);
     background: var(--accent-color);
-    color: var(--primary-color);
+    color: #ffffff;
     text-decoration: none;
     border-radius: var(--border-radius);
     font-size: 0.85rem;
@@ -676,7 +745,7 @@ footer {
 
 .social-icon:hover {
     background: var(--accent-secondary);
-    color: var(--grigio-scuro);
+    color: #1a1f2e;
 }
 
 
@@ -733,7 +802,7 @@ footer {
     position: absolute;
     left: 10px;
     bottom: 20px;
-    z-index: 1000;
+    z-index: 10;
     background-color: var(--card-background);
     border: 1px solid var(--border-color);
     border-radius: 8px;
@@ -749,23 +818,23 @@ footer {
         flex-direction: column;
         align-items: flex-start;
     }
-    
+
     .slider {
         width: 100%;
     }
-    
+
     #symbolic-map-svg {
         max-width: 100%;
         height: auto;
     }
-    
+
     #year-display {
         bottom: 15px;
         right: 15px;
         padding: 10px 15px;
         font-size: 1.5rem;
     }
-    
+
     #symbolic-zoom-controls {
         display: none;
     }
@@ -774,11 +843,11 @@ footer {
         grid-template-columns: 1fr;
         gap: var(--spacing-md);
     }
-    
+
     .team-card-image {
         height: 300px;
     }
-    
+
     .section-about .section-title {
         font-size: 1.5rem;
     }
