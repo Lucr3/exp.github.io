@@ -1,8 +1,4 @@
 export function renderAlluvional(container, datasets) {
-    if (!container || !datasets?.Natural_Disasters) {
-        console.error('Missing container or Natural_Disasters data');
-        return;
-    }
 
     const root = d3.select(container);
     const svg = root.select('#alluvial-svg');
@@ -179,45 +175,82 @@ export function renderAlluvional(container, datasets) {
             return;
         }
 
-        // Count occurrences for each combination
+        // Count occurrences for each combination with event details
         const flowCounts = new Map();
+        const eventsByPath = new Map();
+        const eventCounts = new Map();
 
         data.forEach(d => {
             const group = d['Disaster Group'] || 'Unknown';
+            const subgroup = d['Disaster Subgroup'] || 'Unknown';
             const type = d['Disaster Type'] || 'Unknown';
             const subtype = d['Disaster Subtype'] || 'Unknown';
+            const eventName = d['Event Name'] || 'Unnamed event';
+            const year = d['Start Year'] || 'Unknown';
 
             if (group === 'Unknown' || type === 'Unknown') return;
 
-            const key = `${group}|${type}|${subtype}`;
+            const key = `${group}|${subgroup}|${type}|${subtype}`;
             flowCounts.set(key, (flowCounts.get(key) || 0) + 1);
+            
+            // Store event details for tooltip
+            if (!eventsByPath.has(key)) {
+                eventsByPath.set(key, []);
+            }
+            eventsByPath.get(key).push({ name: eventName, year: year });
+            
+            // Count occurrences of each event by name only
+            eventCounts.set(eventName, (eventCounts.get(eventName) || 0) + 1);
         });
 
         // Build nodes and links for sankey
         const nodesMap = new Map();
         const links = [];
+        const linkEvents = new Map();
 
         const getNodeId = (level, name) => `${level}_${name}`;
 
         flowCounts.forEach((count, key) => {
-            const [group, type, subtype] = key.split('|');
+            const [group, subgroup, type, subtype] = key.split('|');
 
             const groupId = getNodeId('group', group);
+            const subgroupId = getNodeId('subgroup', subgroup);
             const typeId = getNodeId('type', type);
             const subtypeId = getNodeId('subtype', subtype);
 
             if (!nodesMap.has(groupId)) {
                 nodesMap.set(groupId, { id: groupId, name: group, level: 0 });
             }
+            if (!nodesMap.has(subgroupId)) {
+                nodesMap.set(subgroupId, { id: subgroupId, name: subgroup, level: 1 });
+            }
             if (!nodesMap.has(typeId)) {
-                nodesMap.set(typeId, { id: typeId, name: type, level: 1 });
+                nodesMap.set(typeId, { id: typeId, name: type, level: 2 });
             }
             if (!nodesMap.has(subtypeId)) {
-                nodesMap.set(subtypeId, { id: subtypeId, name: subtype, level: 2 });
+                nodesMap.set(subtypeId, { id: subtypeId, name: subtype, level: 3 });
             }
 
-            links.push({ source: groupId, target: typeId, value: count });
-            links.push({ source: typeId, target: subtypeId, value: count });
+            // Create nodes for events and links to them
+            const events = eventsByPath.get(key) || [];
+            // Get unique event names (not by year)
+            const uniqueEventNames = [...new Set(events.map(e => e.name))];
+            
+            uniqueEventNames.forEach(eventName => {
+                const eventId = getNodeId('event', eventName);
+                if (!nodesMap.has(eventId)) {
+                    const eventCount = eventCounts.get(eventName) || 1;
+                    nodesMap.set(eventId, { id: eventId, name: eventName, level: 4, value: eventCount });
+                }
+                // Count how many times this event appears in this subtype path
+                const eventCountInPath = events.filter(e => e.name === eventName).length;
+                // Create link from subtype to event with the count from this path
+                links.push({ source: subtypeId, target: eventId, value: eventCountInPath });
+            });
+
+            links.push({ source: groupId, target: subgroupId, value: count, key: key });
+            links.push({ source: subgroupId, target: typeId, value: count, key: key });
+            links.push({ source: typeId, target: subtypeId, value: count, key: key });
         });
 
         // Aggregate duplicate links
@@ -234,38 +267,31 @@ export function renderAlluvional(container, datasets) {
         const nodes = Array.from(nodesMap.values());
         const aggregatedLinks = Array.from(linkMap.values());
 
-        // Color scales - Coherent disaster-themed palette
+        // Accessible palette for colorblind-safe visualization
+        // Primary colors: Yellow (#FFC20A) and Blue (#0C7BDC)
         const groupColors = {
-            'Natural': '#1e88e5',      // Blue for Natural disasters
-            'Technological': '#e65100' // Deep orange for Technological
+            'Natural': '#0C7BDC',      // Blue
+            'Technological': '#FFC20A' // Yellow
         };
 
-        // Custom type colors - harmonious palette
-        const typeColors = {
-            // Natural disaster types - blue/teal spectrum
-            'Flood': '#0288d1',
-            'Epidemic': '#7b1fa2',
-            'Storm': '#5c6bc0',
-            'Earthquake': '#6d4c41',
-            'Mass movement (wet)': '#00897b',
-            'Volcanic activity': '#d84315',
-
-            // Technological disaster types - orange/red spectrum
-            'Transport': '#f57c00',
-            'Explosion (Industrial)': '#c62828',
-            'Explosion (Miscellaneous)': '#ad1457',
-            'Collapse (Miscellaneous)': '#795548',
-            'Fire (Miscellaneous)': '#ff5722',
-            'Miscellaneous accident (General)': '#607d8b'
+        // Map types to their base colors
+        // Natural types use blue spectrum, Technological types use yellow spectrum
+        const typeBaseColors = {
+            // Natural disaster types - Blue spectrum
+            'Hydrological': '#0C7BDC',
+            'Biological': '#1E90FF',
+            'Geophysical': '#06357A',
+            'Meteorological': '#4A90E2',
+            
+            // Technological disaster types - Yellow spectrum
+            'Transport': '#FFC20A',
+            'Industrial accident': '#FFB81C',
+            'Miscellaneous accident': '#FFD700',
+            'Collapse (Miscellaneous)': '#FFB81C'
         };
 
-        const typeColorScale = d3.scaleOrdinal()
-            .domain(nodes.filter(n => n.level === 1).map(n => n.name))
-            .range([
-                '#0288d1', '#7b1fa2', '#5c6bc0', '#6d4c41', '#00897b', '#d84315',
-                '#f57c00', '#c62828', '#ad1457', '#795548', '#ff5722', '#607d8b',
-                '#00acc1', '#8e24aa', '#3949ab', '#5d4037'
-            ]);
+        // Color function for types
+        const typeColorScale = (name) => typeBaseColors[name] || '#808080';
 
         // Create sankey generator
         const sankey = d3.sankey()
@@ -327,10 +353,34 @@ export function renderAlluvional(container, datasets) {
             .attr('class', 'node');
 
         function getNodeColor(d) {
-            if (d.level === 0) return groupColors[d.name] || '#666';
-            if (d.level === 1) return typeColorScale(d.name);
-            const parentLink = sankeyData.links.find(l => l.target === d && l.source.level === 1);
-            return parentLink ? d3.color(typeColorScale(parentLink.source.name)).darker(0.2) : '#999';
+            if (d.level === 0) {
+                return groupColors[d.name] || '#808080';
+            }
+            
+            // Level 1 (Subgroup): variation of group color with opacity/lightness
+            const parentLink = sankeyData.links.find(l => l.target.id === d.id);
+            if (d.level === 1) {
+                const groupColor = parentLink ? groupColors[parentLink.source.name] : '#808080';
+                return d3.color(groupColor).brighter(0.5);
+            }
+            
+            // Level 2 (Type): use type color scale
+            if (d.level === 2) {
+                return typeColorScale(d.name);
+            }
+            
+            // Level 3 (Subtype): match type color if names correspond, otherwise darker
+            const typeLink = sankeyData.links.find(l => l.target === d && l.source.level === 2);
+            if (typeLink) {
+                const typeColor = typeColorScale(typeLink.source.name);
+                // If subtype name matches type name exactly, use same color
+                if (d.name === typeLink.source.name) {
+                    return typeColor;
+                }
+                // Otherwise use darker variation of the same color
+                return d3.color(typeColor).darker(0.6);
+            }
+            return '#808080';
         }
 
         // Highlight functions
@@ -426,7 +476,7 @@ export function renderAlluvional(container, datasets) {
 
                 const totalValue = d.value || 0;
                 const outgoingLinks = sankeyData.links.filter(l => l.source.id === d.id);
-                const levelNames = ['Gruppo Disastro', 'Tipo', 'Sottotipo'];
+                const levelNames = ['Gruppo Disastro', 'Sottogruppo', 'Tipo', 'Sottotipo'];
 
                 let content = `
                     <div style="text-align: center; margin-bottom: 8px;">
@@ -459,11 +509,11 @@ export function renderAlluvional(container, datasets) {
 
         // Node labels
         nodeElements.append('text')
-            .attr('x', d => d.level === 2 ? d.x1 + 8 : d.x0 - 8)
+            .attr('x', d => d.level === 4 ? d.x1 + 8 : d.x0 - 8)
             .attr('y', d => (d.y0 + d.y1) / 2)
             .attr('dy', '0.35em')
-            .attr('text-anchor', d => d.level === 2 ? 'start' : 'end')
-            .attr('font-size', d => d.level === 0 ? '13px' : '11px')
+            .attr('text-anchor', d => d.level === 4 ? 'start' : 'end')
+            .attr('font-size', d => d.level === 0 ? '13px' : '10px')
             .attr('font-weight', d => d.level === 0 ? 'bold' : 'normal')
             .attr('font-family', 'Roboto Slab, serif')
             .attr('class', 'alluvial-label')
@@ -475,15 +525,17 @@ export function renderAlluvional(container, datasets) {
                 d3.select(this.parentNode).select('rect').attr('stroke', '#fff').attr('stroke-width', 2);
 
                 const totalValue = d.value || 0;
-                const levelNames = ['Gruppo Disastro', 'Tipo', 'Sottotipo'];
+                const levelNames = ['Gruppo Disastro', 'Sottogruppo', 'Tipo', 'Sottotipo', 'Event'];
 
-                showTooltip(event, `
+                let content = `
                     <div style="text-align: center; margin-bottom: 8px;">
                         <strong>${d.name}</strong>
                     </div>
                     <strong>Livello:</strong> ${levelNames[d.level]}<br>
                     <strong>Totale Eventi:</strong> ${d3.format(',')(totalValue)}
-                `);
+                `;
+                
+                showTooltip(event, content);
             })
             .on('mousemove', (event) => {
                 tooltip
@@ -497,8 +549,8 @@ export function renderAlluvional(container, datasets) {
             });
 
         // Column headers
-        const columnTitles = ['Gruppo Disastro', 'Tipo', 'Sottotipo'];
-        const columnX = [margin.left + 10, dims.fullWidth / 2, dims.fullWidth - margin.right - 10];
+        const columnTitles = ['Gruppo Disastro', 'Sottogruppo', 'Tipo', 'Sottotipo', 'Event'];
+        const columnX = [margin.left + 10, (dims.fullWidth - margin.left - margin.right) * 0.25 + margin.left, (dims.fullWidth - margin.left - margin.right) * 0.5 + margin.left, (dims.fullWidth - margin.left - margin.right) * 0.75 + margin.left, dims.fullWidth - margin.right - 10];
 
         svg.append('g')
             .attr('class', 'column-headers')
