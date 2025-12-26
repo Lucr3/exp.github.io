@@ -67,7 +67,7 @@
     --title-bg: #15181f;
     --text-color: #eaeaea;
     --text-muted: var(--grigio-chiaro);
-    --background-color: var(--grigio-scuro);
+    --background-color: #0C1117;
     --card-background: #1a1f2e;
     --border-color: #3d4555;
     --header-bg: #0d1117;
@@ -311,6 +311,10 @@ header {
     background-color: var(--background-color);
 }
 
+#chapter1 {
+    background-color: var(--background-color);
+}
+
 /* ===== GRAFICO + COMMENTO ===== */
 .chart-block {
     display: flex;
@@ -323,7 +327,7 @@ header {
 
 /* ===== CONTAINER GRAFICO ===== */
 .chart-container {
-    background-color: var(--card-background);
+    background-color: var(--background-color);
     border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
     overflow: hidden;
@@ -368,7 +372,31 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--card-background);
+    background-color: var(--background-color);
+}
+
+.chart-wrapper:empty {
+    display: none;
+    min-height: 0;
+    padding: 0;
+}
+
+/* ===== ALLUVIAL WRAPPER ===== */
+.alluvial-wrapper {
+    position: relative;
+    width: 960px;
+    aspect-ratio: 950 / 500;
+    margin: 0 auto;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#alluvial-svg {
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 .chart {
