@@ -192,13 +192,13 @@ export function renderAlluvional(container, datasets) {
 
             const key = `${group}|${subgroup}|${type}|${subtype}`;
             flowCounts.set(key, (flowCounts.get(key) || 0) + 1);
-            
+
             // Store event details for tooltip
             if (!eventsByPath.has(key)) {
                 eventsByPath.set(key, []);
             }
             eventsByPath.get(key).push({ name: eventName, year: year });
-            
+
             // Count occurrences of each event by name only
             eventCounts.set(eventName, (eventCounts.get(eventName) || 0) + 1);
         });
@@ -235,7 +235,7 @@ export function renderAlluvional(container, datasets) {
             const events = eventsByPath.get(key) || [];
             // Get unique event names (not by year)
             const uniqueEventNames = [...new Set(events.map(e => e.name))];
-            
+
             uniqueEventNames.forEach(eventName => {
                 const eventId = getNodeId('event', eventName);
                 if (!nodesMap.has(eventId)) {
@@ -268,26 +268,26 @@ export function renderAlluvional(container, datasets) {
         const aggregatedLinks = Array.from(linkMap.values());
 
         // Accessible palette for colorblind-safe visualization
-        // Primary colors: Yellow (#FFC20A) and Blue (#0C7BDC)
+        // High-contrast palette (Okabe-Ito / IBM Design inspired)
         const groupColors = {
-            'Natural': '#0C7BDC',      // Blue
-            'Technological': '#FFC20A' // Yellow
+            'Natural': '#0077BB',      // Accessibile Blue
+            'Technological': '#EE7733' // Accessibile Orange
         };
 
         // Map types to their base colors
-        // Natural types use blue spectrum, Technological types use yellow spectrum
+        // Natural types use cool spectrum, Technological types use warm spectrum
         const typeBaseColors = {
-            // Natural disaster types - Blue spectrum
-            'Hydrological': '#0C7BDC',
-            'Biological': '#1E90FF',
-            'Geophysical': '#06357A',
-            'Meteorological': '#4A90E2',
-            
-            // Technological disaster types - Yellow spectrum
-            'Transport': '#FFC20A',
-            'Industrial accident': '#FFB81C',
-            'Miscellaneous accident': '#FFD700',
-            'Collapse (Miscellaneous)': '#FFB81C'
+            // Natural disaster types - Cool spectrum
+            'Hydrological': '#33BBEE',    // Cyan
+            'Biological': '#009988',      // Teal
+            'Geophysical': '#004488',     // Dark Blue (High contrast)
+            'Meteorological': '#6633CC',  // Purple (Distinct from blues)
+
+            // Technological disaster types - Warm spectrum
+            'Transport': '#EE7733',             // Orange (matches group)
+            'Industrial accident': '#CC3311',   // Red/Vermilion
+            'Miscellaneous accident': '#EE3377',// Magenta
+            'Collapse (Miscellaneous)': '#DDAA33' // Gold/Dark Yellow
         };
 
         // Color function for types
@@ -356,19 +356,19 @@ export function renderAlluvional(container, datasets) {
             if (d.level === 0) {
                 return groupColors[d.name] || '#808080';
             }
-            
+
             // Level 1 (Subgroup): variation of group color with opacity/lightness
             const parentLink = sankeyData.links.find(l => l.target.id === d.id);
             if (d.level === 1) {
                 const groupColor = parentLink ? groupColors[parentLink.source.name] : '#808080';
                 return d3.color(groupColor).brighter(0.5);
             }
-            
+
             // Level 2 (Type): use type color scale
             if (d.level === 2) {
                 return typeColorScale(d.name);
             }
-            
+
             // Level 3 (Subtype): match type color if names correspond, otherwise darker
             const typeLink = sankeyData.links.find(l => l.target === d && l.source.level === 2);
             if (typeLink) {
@@ -534,7 +534,7 @@ export function renderAlluvional(container, datasets) {
                     <strong>Livello:</strong> ${levelNames[d.level]}<br>
                     <strong>Totale Eventi:</strong> ${d3.format(',')(totalValue)}
                 `;
-                
+
                 showTooltip(event, content);
             })
             .on('mousemove', (event) => {
