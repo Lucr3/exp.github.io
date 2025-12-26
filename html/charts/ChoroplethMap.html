@@ -1,80 +1,63 @@
-<section class="section section-chart" id="choropleth-map">
-    <div class="container">
-        <div class="chart-container static">
-            <div class="chart-wrapper">
-                <div id="ChoroplethMap-render">
-                    <div id="choropleth-chart">
-                        <div class="h5 pt-3 fw-bold text-center" style="color: var(--text-color);">
-                            Costo del Cibo per Governatorato
-                        </div>
-                        <div class="h6 pt-2 mb-4 fw-bold text-center" style="color: var(--text-muted);">
-                            Prezzo medio (YER/KG) per Admin1
-                        </div>
+<div id="choropleth-chart">
+    <div class="h5 pt-3 fw-bold text-center" style="color: var(--text-color);">
+        Costo del Cibo per Governatorato
+    </div>
+    <div class="h6 pt-2 mb-4 fw-bold text-center" style="color: var(--text-muted);">
+        Prezzo medio (YER/KG) per Admin1
+    </div>
 
-                        <div class="mb-3 text-center">
-                            <div class="d-inline-block align-middle mx-2">
-                                <label for="choropleth-commodity"
-                                    class="form-label fw-semibold mb-0 me-2">Commodity:</label>
-                                <select id="choropleth-commodity" class="form-select form-select-sm d-inline-block"
-                                    style="width: auto;"></select>
-                            </div>
-                        </div>
+    <div class="mb-3 text-center">
+        <div class="d-inline-block align-middle mx-2">
+            <label for="choropleth-commodity" class="form-label fw-semibold mb-0 me-2">Commodity:</label>
+            <select id="choropleth-commodity" class="form-select form-select-sm d-inline-block"
+                style="width: auto;"></select>
+        </div>
+    </div>
 
-                        <!-- Year Slider Controls -->
-                        <div class="mb-3 text-center">
-                            <div class="d-flex justify-content-center align-items-center flex-wrap gap-3">
-                                <div class="d-flex align-items-center gap-2">
-                                    <label for="choropleth-year-slider"
-                                        class="form-label fw-semibold mb-0">Anno:</label>
-                                    <input type="range" id="choropleth-year-slider" class="form-range"
-                                        style="width: 200px;">
-                                    <span id="choropleth-year-slider-value" class="badge bg-secondary">2023</span>
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <button id="choropleth-play-btn" class="btn btn-sm btn-primary">
-                                        <i class="bi bi-play-fill"></i> Play
-                                    </button>
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <label for="choropleth-speed-slider"
-                                        class="form-label fw-semibold mb-0">Velocità:</label>
-                                    <input type="range" id="choropleth-speed-slider" class="form-range"
-                                        style="width: 80px;" min="300" max="2000" value="1000">
-                                    <span id="choropleth-speed-value" class="small"
-                                        style="color: var(--text-muted);">1.0s</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Zoom Controls -->
-                        <div class="mb-2 text-center">
-                            <div class="btn-group btn-group-sm" role="group" aria-label="Zoom controls">
-                                <button id="choropleth-zoom-in" class="btn btn-outline-secondary" title="Zoom In">
-                                    <i class="bi bi-zoom-in"></i>
-                                </button>
-                                <button id="choropleth-zoom-out" class="btn btn-outline-secondary" title="Zoom Out">
-                                    <i class="bi bi-zoom-out"></i>
-                                </button>
-                                <button id="choropleth-zoom-reset" class="btn btn-outline-secondary" title="Reset Zoom">
-                                    <i class="bi bi-arrows-fullscreen"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="choropleth-wrapper" style="position: relative;">
-                            <svg id="choropleth-svg" preserveAspectRatio="xMidYMid meet"></svg>
-                        </div>
-
-                        <div class="card-narrow">
-                            <p class="mt-2 mb-0 pt-2 small text-start card-note">
-                                Questa mappa coropletica mostra il costo medio del cibo per governatorato nello Yemen.
-                                I colori più intensi indicano prezzi più elevati. Passa il mouse sui governatorati
-                                per vedere i dettagli. Usa i filtri per esplorare diversi prodotti e anni.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+    <!-- Year Slider Controls -->
+    <div class="mb-3 text-center">
+        <div class="d-flex justify-content-center align-items-center flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-2">
+                <label for="choropleth-year-slider" class="form-label fw-semibold mb-0">Anno:</label>
+                <input type="range" id="choropleth-year-slider" class="form-range" style="width: 200px;">
+                <span id="choropleth-year-slider-value" class="badge bg-secondary">2023</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button id="choropleth-play-btn" class="btn btn-sm btn-primary">
+                    <i class="bi bi-play-fill"></i> Play
+                </button>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <label for="choropleth-speed-slider" class="form-label fw-semibold mb-0">Velocità:</label>
+                <input type="range" id="choropleth-speed-slider" class="form-range" style="width: 80px;" min="300"
+                    max="2000" value="1000">
+                <span id="choropleth-speed-value" class="small" style="color: var(--text-muted);">1.0s</span>
             </div>
         </div>
     </div>
-</section>
+
+    <!-- Zoom Controls -->
+    <div class="mb-2 text-center">
+        <div class="btn-group btn-group-sm" role="group" aria-label="Zoom controls">
+            <button id="choropleth-zoom-in" class="btn btn-outline-secondary" title="Zoom In">
+                <i class="bi bi-zoom-in"></i>
+            </button>
+            <button id="choropleth-zoom-out" class="btn btn-outline-secondary" title="Zoom Out">
+                <i class="bi bi-zoom-out"></i>
+            </button>
+            <button id="choropleth-zoom-reset" class="btn btn-outline-secondary" title="Reset Zoom">
+                <i class="bi bi-arrows-fullscreen"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="choropleth-wrapper" style="position: relative;">
+        <svg id="choropleth-svg" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+
+    <p class="mt-2 mb-0 pt-2 small text-start card-note">
+        Questa mappa coropletica mostra il costo medio del cibo per governatorato nello Yemen.
+        I colori più intensi indicano prezzi più elevati. Passa il mouse sui governatorati
+        per vedere i dettagli. Usa i filtri per esplorare diversi prodotti e anni.
+    </p>
+</div>
