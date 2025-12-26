@@ -16,10 +16,10 @@ export function renderAlluvional(container, datasets) {
         return theme === 'dark' ? '#e0e0e0' : '#333333';
     };
 
-    const tooltip = d3.select('#alluvial-tooltip').empty() 
+    const tooltip = d3.select('#alluvial-tooltip').empty()
         ? d3.select('body').append('div').attr('id', 'alluvial-tooltip')
         : d3.select('#alluvial-tooltip');
-    
+
     tooltip
         .classed('chart-tooltip', true)
         .style('position', 'fixed')
@@ -68,10 +68,14 @@ export function renderAlluvional(container, datasets) {
     updateYearOptions(yearStartSelect, allYears, YEAR_MIN);
     updateYearOptions(yearEndSelect, allYears, YEAR_MAX);
 
-    yearStartSelect.on('change', syncYearSelectors);
+    yearStartSelect.on('change', () => {
+        syncYearSelectors();
+        updateChart();
+    });
     yearEndSelect.on('change', () => {
         const endVal = +yearEndSelect.property('value');
         updateYearOptions(yearStartSelect, allYears.filter(y => y <= endVal), +yearStartSelect.property('value'));
+        updateChart();
     });
 
     const truncateLabel = (text, maxLength) => {
