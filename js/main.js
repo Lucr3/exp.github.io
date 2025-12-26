@@ -28,7 +28,8 @@ async function init() {
     // Seconda fase: carica i chart dentro le sezioni (i container ora esistono)
     await Promise.all([
         loadHtml('SymbolMap-container', 'html/charts/SymbolMap.html'),
-        loadHtml('ChoroplethMap-render', 'html/charts/ChoroplethMap.html')
+        loadHtml('ChoroplethMap-render', 'html/charts/ChoroplethMap.html'),
+        loadHtml('BoxPlot-render', 'html/charts/BoxPlot.html')
     ]);
 
     document.getElementById('logo-button')?.addEventListener('click', (e) => {
