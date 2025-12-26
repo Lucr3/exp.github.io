@@ -887,3 +887,81 @@ footer {
     font-size: 0.95rem;
     line-height: 1.6;
 }
+
+/* ===== RANGE SLIDER STYLING FOR LIGHT/DARK MODE ===== */
+/* Using !important to override Bootstrap defaults */
+.form-range {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    width: 100%;
+    height: 8px !important;
+    background: var(--border-color) !important;
+    border-radius: 4px !important;
+    outline: none;
+    cursor: pointer;
+    padding: 0 !important;
+}
+
+.form-range::-webkit-slider-runnable-track {
+    background: var(--border-color) !important;
+    height: 8px !important;
+    border-radius: 4px !important;
+}
+
+.form-range::-webkit-slider-thumb {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    width: 18px !important;
+    height: 18px !important;
+    background: var(--accent-color) !important;
+    border-radius: 50% !important;
+    cursor: pointer;
+    border: 2px solid var(--background-color) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin-top: -5px;
+    /* Center thumb on track */
+}
+
+.form-range::-webkit-slider-thumb:hover {
+    background: var(--azzurro) !important;
+    transform: scale(1.1);
+}
+
+.form-range::-moz-range-thumb {
+    width: 18px !important;
+    height: 18px !important;
+    background: var(--accent-color) !important;
+    border-radius: 50% !important;
+    cursor: pointer;
+    border: 2px solid var(--background-color) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.form-range::-moz-range-track {
+    background: var(--border-color) !important;
+    height: 8px !important;
+    border-radius: 4px !important;
+}
+
+/* Light mode specific adjustments */
+[data-theme="light"] .form-range {
+    background: #b0b0b0 !important;
+}
+
+[data-theme="light"] .form-range::-webkit-slider-runnable-track {
+    background: #b0b0b0 !important;
+}
+
+[data-theme="light"] .form-range::-webkit-slider-thumb {
+    background: var(--blu) !important;
+    border-color: #ffffff !important;
+}
+
+[data-theme="light"] .form-range::-moz-range-thumb {
+    background: var(--blu) !important;
+    border-color: #ffffff !important;
+}
+
+[data-theme="light"] .form-range::-moz-range-track {
+    background: #b0b0b0 !important;
+}
