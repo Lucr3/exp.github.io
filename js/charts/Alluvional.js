@@ -29,10 +29,12 @@ export function renderAlluvional(container, datasets) {
             .attr('value', d => d)
             .text(d => d);
 
-        if (currentEnd >= minYear) {
-            yearEndSelect.property('value', currentEnd);
-        } else {
-            yearEndSelect.property('value', validYears[validYears.length - 1]);
+        if (validYears.length > 0) {
+            if (currentEnd >= minYear) {
+                yearEndSelect.property('value', currentEnd);
+            } else {
+                yearEndSelect.property('value', validYears[validYears.length - 1]);
+            }
         }
     }
 
@@ -53,7 +55,7 @@ export function renderAlluvional(container, datasets) {
         if (currentStart <= maxYear) {
             yearStartSelect.property('value', currentStart);
         } else {
-            yearStartSelect.property('value', validYears[0]);
+            yearStartSelect.property('value', YEAR_MIN);
         }
     }
 
