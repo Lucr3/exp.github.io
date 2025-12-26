@@ -104,22 +104,31 @@ export function renderChoroplethMap(container, datasets) {
     }
 
     // Check for required data
+    console.log('Rendering ChoroplethMap with datasets:', Object.keys(datasets));
     if (!datasets.YemenPrices) {
         console.error('Missing required dataset: YemenPrices');
         return;
     }
 
     const priceData = datasets.YemenPrices;
+    console.log('Price Data loaded, rows:', priceData.length);
 
     // Extract years from data
     const extractYear = dateStr => {
         if (!dateStr) return null;
-        const parts = dateStr.split('/');
-        return parts.length === 3 ? +parts[2] : null;
+        // Handle potentially different date formats
+        const parts = dateStr.includes('/') ? dateStr.split('/') : dateStr.split('-');
+        if (parts.length === 3) {
+            // Assuming d/m/y or y-m-d, usually year is last or first. 
+            // Given previous code was index 2, let's try to find the 4-digit part.
+            const fourDigit = parts.find(p => p.length === 4);
+            return fourDigit ? +fourDigit : null;
+        }
+        return null;
     };
 
     const years = [...new Set(priceData.map(d => extractYear(d['Price Date'])))]
-        .filter(y => y && y > 2000)
+        .filter(y => y && y >= 2010 && y <= 2030) // Filter reasonable range
         .sort((a, b) => a - b);
 
     if (years.length === 0) {
@@ -151,9 +160,11 @@ export function renderChoroplethMap(container, datasets) {
     }
 
     // Name mapping for GeoJSON to CSV
+    // Name mapping for GeoJSON to CSV
+    // Key: GeoJSON name, Value: Array of possible CSV names
     const nameMapping = {
         "Sanʿaʾ": ["Sana'a", "Sanaa", "Amanat Al Asimah"],
-        "Sanʿaʾ Governorate": ["Sana'a", "Sanaa"],
+        "Sanʿaʾ Governorate": ["Sana'a", "Sanaa", "Amanat Al Asimah"], // Explicitly map Governorate version too
         "Lahij Governorate": ["Lahj"],
         "'Adan Governorate": ["Aden"],
         "Ḥaḍramawt Governorate": ["Hadramaut", "Hadhramaut"],
@@ -171,7 +182,7 @@ export function renderChoroplethMap(container, datasets) {
         "Shabwah Governorate": ["Shabwah"],
         "Abyan Governorate": ["Abyan"],
         "Al Mahrah Governorate": ["Al Maharah"],
-        "Ad Dāliʿ Governorate": ["Al Dhale'e", "Ad Dali"],
+        "Ad Dāliʿ Governorate": ["Al Dhale'e", "Ad Dali", "Al Dhale"],
         "Raymah Governorate": ["Raymah"],
         "Socotra Governorate": ["Socotra"]
     };
@@ -180,16 +191,27 @@ export function renderChoroplethMap(container, datasets) {
         if (!geoName) return null;
         const cleanName = geoName.trim();
 
-        // Check mapping
+        // 1. Check direct mapping
+        if (nameMapping[cleanName]) return nameMapping[cleanName][0];
+
+        // 2. Check mapping with partial matches
         for (const [geoKey, csvVariants] of Object.entries(nameMapping)) {
-            if (cleanName === geoKey || cleanName.includes(geoKey.replace(' Governorate', ''))) {
+            // If the key is contained in the name (e.g. key "Lahij" in "Lahij Governorate")
+            if (cleanName.includes(geoKey) || geoKey.includes(cleanName)) {
                 return csvVariants[0];
             }
         }
 
-        // Try to match by removing "Governorate"
-        const simpleName = cleanName.replace(' Governorate', '').replace(/[ʿʾ]/g, "'");
-        return simpleName;
+        // 3. Fallback: simplify string
+        let simple = cleanName
+            .replace(' Governorate', '')
+            .replace(/[ʿʾ]/g, "'") // Replace glottal stops
+            .replace(/[āīūḥḍṭẓṣ]/g, (c) => { // Remove diacritics
+                const map = { 'ā': 'a', 'ī': 'i', 'ū': 'u', 'ḥ': 'h', 'ḍ': 'd', 'ṭ': 't', 'ẓ': 'z', 'ṣ': 's' };
+                return map[c] || c;
+            });
+
+        return simple;
     };
 
     // Aggregate prices by Admin1
@@ -203,8 +225,18 @@ export function renderChoroplethMap(container, datasets) {
         const byAdmin = new Map();
         filtered.forEach(d => {
             const admin = d['Admin 1']?.trim();
-            const price = +d.Price;
+            // Handle number parsing carefully (e.g. "1,200.50")
+            let rawPrice = d.Price;
+            if (typeof rawPrice === 'string') {
+                rawPrice = rawPrice.replace(/,/g, '');
+            }
+            const price = +rawPrice;
+
             if (admin && !isNaN(price) && price > 0) {
+                // Normalize admin name from CSV side as well if needed, 
+                // but usually we match FROM GeoJSON TO CSV.
+                // Here we just store by the CSV name.
+
                 if (!byAdmin.has(admin)) {
                     byAdmin.set(admin, { sum: 0, count: 0 });
                 }
@@ -221,11 +253,8 @@ export function renderChoroplethMap(container, datasets) {
     };
 
     // Projection for Yemen
-    const projection = d3.geoMercator()
-        .center([48, 15.5])
-        .scale(3200)
-        .translate([width / 2, height / 2]);
-
+    // Use fitSize to ensure the map is correctly scaled and centered based on the data
+    const projection = d3.geoMercator();
     const path = d3.geoPath().projection(projection);
 
     // Color gradient for prices
@@ -277,6 +306,28 @@ export function renderChoroplethMap(container, datasets) {
     // Load local GeoJSON
     d3.json('datasets/yemen_admin1.geojson')
         .then(function (geoData) {
+            // FIX: Rewind GeoJSON - unconditionally reverse all rings
+            // The original GeoJSON has clockwise winding which causes D3 to render the exterior
+            // (the entire world minus the shape) instead of the interior.
+            // Reversing makes them counter-clockwise as D3 expects for exterior rings.
+
+            geoData.features.forEach(feature => {
+                if (feature.geometry.type === "Polygon") {
+                    feature.geometry.coordinates.forEach(ring => {
+                        ring.reverse();
+                    });
+                } else if (feature.geometry.type === "MultiPolygon") {
+                    feature.geometry.coordinates.forEach(polygon => {
+                        polygon.forEach(ring => {
+                            ring.reverse();
+                        });
+                    });
+                }
+            });
+
+            // Fit projection to the data
+            projection.fitSize([width, height], geoData);
+
             // Build legend
             const legendData = [
                 { value: "≤100", color: gradient[0] },
@@ -356,12 +407,24 @@ export function renderChoroplethMap(container, datasets) {
 
                         // Try to find price in data
                         let price = null;
-                        for (const [admin, avgPrice] of pricesByAdmin.entries()) {
-                            if (admin.toLowerCase().includes(csvName?.toLowerCase()) ||
-                                csvName?.toLowerCase().includes(admin.toLowerCase())) {
-                                price = avgPrice;
-                                break;
+
+                        // Direct lookup first (fastest)
+                        if (csvName && pricesByAdmin.has(csvName)) {
+                            price = pricesByAdmin.get(csvName);
+                        } else {
+                            // Fuzzy lookup
+                            for (const [admin, avgPrice] of pricesByAdmin.entries()) {
+                                if (csvName && (admin.toLowerCase() === csvName.toLowerCase() ||
+                                    admin.toLowerCase().includes(csvName.toLowerCase()) ||
+                                    csvName.toLowerCase().includes(admin.toLowerCase()))) {
+                                    price = avgPrice;
+                                    break;
+                                }
                             }
+                        }
+
+                        if (price === null) {
+                            // console.debug(`No price for ${geoName} (mapped to ${csvName}) in ${selectedYear}`);
                         }
 
                         if (!price) return '#e0e0e0';
