@@ -59,13 +59,23 @@ export function renderChoroplethMap(container, datasets) {
     const width = fullWidth - margin.left - margin.right;
     const height = fullHeight - margin.top - margin.bottom;
 
+    // Make SVG responsive using viewBox
     svg
+        .attr('viewBox', `0 0 ${fullWidth} ${fullHeight}`)
+        .attr('preserveAspectRatio', 'xMidYMid meet')
+        .style('width', '100%')
+        .style('height', 'auto')
+        .style('max-height', '70vh'); // Prevent it from being too tall on wide screens
+
+    svg.selectAll('g.chart-root, rect.background').remove();
+
+    // Add dark background like SymbolMap
+    svg.append('rect')
+        .attr('class', 'background')
         .attr('width', fullWidth)
         .attr('height', fullHeight)
-        .style('max-width', '100%')
-        .style('height', 'auto');
+        .attr('fill', '#2d3436');
 
-    svg.selectAll('g.chart-root').remove();
     const g = svg
         .append('g')
         .attr('class', 'chart-root')
@@ -257,17 +267,17 @@ export function renderChoroplethMap(container, datasets) {
     const projection = d3.geoMercator();
     const path = d3.geoPath().projection(projection);
 
-    // Color gradient for prices
+    // Color gradient for prices - matching SymbolMap colors (yellow to red)
     const gradient = [
-        '#ffffcc',
-        '#ffeda0',
-        '#fed976',
-        '#feb24c',
-        '#fd8d3c',
-        '#fc4e2a',
-        '#e31a1c',
-        '#bd0026',
-        '#800026'
+        '#ffeaa7', // Light yellow (low prices)
+        '#fdcb6e',
+        '#f9a825',
+        '#f39c12',
+        '#e67e22',
+        '#e74c3c',
+        '#c0392b',
+        '#a93226',
+        '#d63031'  // Deep red (high prices)
     ];
 
     const colorScale = d3.scaleThreshold()
@@ -427,11 +437,11 @@ export function renderChoroplethMap(container, datasets) {
                             // console.debug(`No price for ${geoName} (mapped to ${csvName}) in ${selectedYear}`);
                         }
 
-                        if (!price) return '#e0e0e0';
+                        if (!price) return '#636e72'; // Grey for no data (matching SymbolMap)
                         return colorScale(price);
                     })
                     .selection()
-                    .attr('stroke', '#fff')
+                    .attr('stroke', '#4a5459') // Grey stroke matching SymbolMap
                     .attr('stroke-width', 0.5)
                     .style('cursor', 'pointer')
                     .on('mouseenter', (event, d) => {
@@ -494,11 +504,12 @@ export function renderChoroplethMap(container, datasets) {
                     .append('text')
                     .attr('class', 'year-label')
                     .attr('x', width - 10)
-                    .attr('y', height - 10)
+                    .attr('y', height - 80) // Moved higher to avoid Socotra
                     .attr('text-anchor', 'end')
                     .attr('font-size', 48)
                     .attr('font-weight', 'bold')
                     .attr('fill', 'var(--text-color)')
+                    .style('pointer-events', 'none') // Allow mouse events to pass through to map
                     .attr('opacity', 0)
                     .merge(yearLabelSelection)
                     .text(d => d)
