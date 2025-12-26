@@ -11,7 +11,7 @@ export function renderAlluvional(container, datasets) {
     const rawData = datasets.Natural_Disasters;
     const allYears = [...new Set(rawData.map(d => +d['Start Year']).filter(y => y && y > 1900))].sort((a, b) => a - b);
 
-    const YEAR_MIN = allYears[0] || 1991;
+    const YEAR_MIN = 2014;
     const YEAR_MAX = allYears[allYears.length - 1] || 2025;
 
     // Dynamic year selector functions
