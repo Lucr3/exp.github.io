@@ -41,8 +41,8 @@ async function init() {
         loadHtml('BoxPlot-render', 'html/charts/BoxPlot.html'),
         loadHtml('DumbbellPlot-render', 'html/charts/DumbbellPlot.html'),
         loadHtml('StackedArea-render', 'html/charts/StackedArea.html'),
-        loadHtml('GroupedBarChart-render', 'html/charts/GroupedBarChart.html'),
-        loadHtml('StackedBarChart-render', 'html/charts/StackedBarChart.html')
+        loadHtml('GroupedBarChart-container', 'html/charts/GroupedBarChart.html'),
+        loadHtml('StackedBarChart-container', 'html/charts/StackedBarChart.html')
     ]);
 
     document.getElementById('logo-button')?.addEventListener('click', (e) => {
@@ -61,8 +61,8 @@ async function init() {
     renderGraph('BoxPlot-render', renderBoxPlot, datasets);
     renderGraph('DumbbellPlot-render', renderDumbbellPlot, datasets);
     renderGraph('StackedArea-render', renderStackedArea, datasets);
-    renderGraph('GroupedBarChart-render', renderGroupedBarChart, datasets);
-    renderGraph('StackedBarChart-render', renderStackedBarChart, datasets);
+    renderGraph('GroupedBarChart-container', renderGroupedBarChart, datasets);
+    renderGraph('StackedBarChart-container', renderStackedBarChart, datasets);
 }
 
 document.addEventListener('DOMContentLoaded', init);
