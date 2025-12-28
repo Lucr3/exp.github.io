@@ -114,14 +114,12 @@ export function renderChoroplethMap(container, datasets) {
     }
 
     // Check for required data
-    console.log('Rendering ChoroplethMap with datasets:', Object.keys(datasets));
     if (!datasets.YemenPrices) {
         console.error('Missing required dataset: YemenPrices');
         return;
     }
 
     const priceData = datasets.YemenPrices;
-    console.log('Price Data loaded, rows:', priceData.length);
 
     // Extract years from data
     const extractYear = dateStr => {
