@@ -22,7 +22,7 @@ export function renderDumbbellPlot(container, datasets) {
 
     // Filter data from 1950 to 2025
     const filteredData = data.filter(d => d.year >= 1950 && d.year <= 2025);
-    
+
     if (filteredData.length === 0) return;
 
     const startData = filteredData[0];
@@ -97,7 +97,7 @@ export function renderDumbbellPlot(container, datasets) {
             .attr('stroke', textColor).attr('stroke-width', 1).attr('stroke-dasharray', '6,3')
             .attr('opacity', 0.4)
             .style('pointer-events', 'none');
-        
+
         g.append('text')
             .attr('x', -15).attr('y', zeroY - 8).attr('text-anchor', 'end')
             .style('font-size', '9px').style('fill', textMuted).style('font-style', 'italic')
@@ -136,12 +136,12 @@ export function renderDumbbellPlot(container, datasets) {
     for (let i = 0; i < filteredData.length - 1; i++) {
         const current = filteredData[i];
         const next = filteredData[i + 1];
-        
+
         // Color based on mortality rate (average of current and next)
         const avgRate = (current.rate + next.rate) / 2;
         const progress = (avgRate - minRate) / (maxRate - minRate);
         const color = d3.interpolate(COLORS.start, COLORS.worsened)(progress);
-        
+
         const x1 = xScale(current.year);
         const y1 = yScale(current.rate);
         const x2 = xScale(next.year);
@@ -150,7 +150,7 @@ export function renderDumbbellPlot(container, datasets) {
         g.append('line')
             .attr('x1', x1).attr('y1', y1)
             .attr('x2', x2).attr('y2', y2)
-            .attr('stroke', color).attr('stroke-width', 2.5).attr('opacity', 1)
+            .style('stroke', color).attr('stroke-width', 2.5).attr('opacity', 1)
             .style('pointer-events', 'none');
     }
 
@@ -171,13 +171,13 @@ export function renderDumbbellPlot(container, datasets) {
             const [mouseX] = d3.pointer(event);
             const year = Math.round(xScale.invert(mouseX));
             const dataPoint = filteredData.find(d => d.year === year);
-            
+
             if (dataPoint) {
                 verticalLine
                     .attr('x1', xScale(year))
                     .attr('x2', xScale(year))
                     .attr('opacity', 0.6);
-                
+
                 showTooltip(event,
                     `<strong>${dataPoint.year}</strong><br/>Under-15 Mortality: <span style="font-weight:bold">${dataPoint.rate.toFixed(2)}%</span>`);
             }
@@ -193,31 +193,31 @@ export function renderDumbbellPlot(container, datasets) {
     const legendX = WIDTH / 2 - 100;
     const legendY = HEIGHT + 30;
     const legendWidth = 150;
-    
+
     // Create color scale gradient (inverted)
     const defs = svg.append('defs');
     const gradient = defs.append('linearGradient')
         .attr('id', 'color-scale-gradient')
         .attr('x1', '0%').attr('y1', '0%')
         .attr('x2', '100%').attr('y2', '0%');
-    
+
     gradient.append('stop').attr('offset', '0%').attr('stop-color', COLORS.worsened);
     gradient.append('stop').attr('offset', '100%').attr('stop-color', COLORS.start);
-    
+
     // Max value label (left)
     g.append('text')
         .attr('x', legendX - 10).attr('y', legendY + 20)
         .style('font-size', '11px').style('fill', textColor)
         .style('text-anchor', 'end')
         .text(`${maxRate.toFixed(1)}%`);
-    
+
     // Legend background rectangle (gradient)
     g.append('rect')
         .attr('x', legendX).attr('y', legendY)
         .attr('width', legendWidth).attr('height', 15)
         .attr('fill', 'url(#color-scale-gradient)')
         .attr('stroke', textMuted).attr('stroke-width', 1);
-    
+
     // Min value label (right)
     g.append('text')
         .attr('x', legendX + legendWidth + 10).attr('y', legendY + 20)
