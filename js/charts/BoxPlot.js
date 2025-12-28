@@ -166,7 +166,15 @@ export function renderBoxPlot(container, datasets) {
       .enter()
       .append('g')
       .attr('class', 'boxplot')
-      .attr('transform', d => `translate(${xScale(d.commodity) + xScale.bandwidth() / 2},0)`);
+      .attr('transform', d => `translate(${xScale(d.commodity) + xScale.bandwidth() / 2}, 50)`)
+      .attr('opacity', 0);
+
+    boxes.transition()
+      .duration(600)
+      .delay((d, i) => i * 30)
+      .ease(d3.easeCubicOut)
+      .attr('transform', d => `translate(${xScale(d.commodity) + xScale.bandwidth() / 2},0)`)
+      .attr('opacity', 1);
 
     // Whiskers (lines)
     boxes.append('line')
@@ -300,6 +308,7 @@ export function renderBoxPlot(container, datasets) {
       .style('font-size', '10px')
       .style('fill', textColor)
       .text(d => d.commodity.length > 15 ? d.commodity.substring(0, 15) + '…' : d.commodity);
+
   }
 
   // ========================================
@@ -448,7 +457,6 @@ export function renderBoxPlot(container, datasets) {
 
     const g = svg.append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
-
     const prices = rawData.map(d => d.price);
 
     // X scale for prices
@@ -501,9 +509,9 @@ export function renderBoxPlot(container, datasets) {
       .enter()
       .append('rect')
       .attr('x', d => xScale(d.x0) + 1)
-      .attr('y', d => yScale(d.length))
       .attr('width', d => Math.max(0, xScale(d.x1) - xScale(d.x0) - 2))
-      .attr('height', d => height - yScale(d.length))
+      .attr('y', height)
+      .attr('height', 0)
       .attr('fill', d => getBarColor(d))
       .attr('opacity', 0.7)
       .style('cursor', 'pointer')
@@ -536,7 +544,12 @@ export function renderBoxPlot(container, datasets) {
       .on('mouseleave', function (event, d) {
         d3.select(this).attr('opacity', 0.7).attr('fill', getBarColor(d));
         histTooltip.style('opacity', 0).style('display', 'none');
-      });
+      })
+      .transition()
+      .duration(750)
+      .ease(d3.easeBackOut.overshoot(0.7))
+      .attr('y', d => yScale(d.length))
+      .attr('height', d => height - yScale(d.length));
 
     // Median line (vertical reference)
     g.append('line')
@@ -558,10 +571,11 @@ export function renderBoxPlot(container, datasets) {
       .style('font-weight', 'bold')
       .text(`Median: ${formatNum(Math.round(data.median))}`);
 
-    // X axis
+    // X axis (no domain line)
     g.append('g')
       .attr('transform', `translate(0,${height})`)
       .call(d3.axisBottom(xScale).ticks(8).tickFormat(d3.format(',')))
+      .call(g => g.select('.domain').remove())
       .style('font-size', '10px')
       .style('color', textMut);
 
@@ -574,9 +588,14 @@ export function renderBoxPlot(container, datasets) {
       .style('fill', textMut)
       .text('Price (YER)');
 
-    // Y axis
+    // Y axis (with grid lines)
     g.append('g')
-      .call(d3.axisLeft(yScale).ticks(5))
+      .call(d3.axisLeft(yScale).ticks(5).tickSize(-width))
+      .call(g => g.select('.domain').remove())
+      .call(g => g.selectAll('.tick line')
+        .attr('stroke', textMut)
+        .attr('stroke-opacity', 0.2)
+        .attr('stroke-dasharray', '2,2')) // Optional: make it distinct from other lines
       .style('font-size', '10px')
       .style('color', textMut);
 
