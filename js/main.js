@@ -3,6 +3,11 @@ import { loadCSV } from './utils/dataLoader.js';
 import { renderGraph } from './utils/domLoader.js';
 import { renderSymbolMap } from './charts/SymbolMap.js';
 import { renderAlluvional } from './charts/Alluvional.js';
+
+// Protezione da errori di devtools
+if (typeof window !== 'undefined' && window.__chromium_devtools_metrics_reporter === undefined) {
+    window.__chromium_devtools_metrics_reporter = () => {};
+}
 import { renderChoroplethMap } from './charts/ChoroplethMap.js';
 import { renderBoxPlot } from './charts/BoxPlot.js';
 import { renderDumbbellPlot } from './charts/DumbbellPlot.js';
