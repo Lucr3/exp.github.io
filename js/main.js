@@ -7,6 +7,8 @@ import { renderChoroplethMap } from './charts/ChoroplethMap.js';
 import { renderBoxPlot } from './charts/BoxPlot.js';
 import { renderDumbbellPlot } from './charts/DumbbellPlot.js';
 import { renderStackedArea } from './charts/StackedArea.js';
+import { renderGroupedBarChart } from './charts/GroupedBarChart.js';
+import { renderStackedBarChart } from './charts/StackedBarChart.js';
 
 async function init() {
     const datasets = {
@@ -15,7 +17,8 @@ async function init() {
         Natural_Disasters: await loadCSV("Natural_Disasters.csv"),
         YemenPrices: await loadCSV("yemen_prices.csv"),
         YouthMortality: await loadCSV("youth-mortality-rate.csv"),
-        BirthsDeaths: await loadCSV("births-and-deaths-projected-to-2100.csv")
+        BirthsDeaths: await loadCSV("births-and-deaths-projected-to-2100.csv"),
+        Education: await loadCSV("primary-secondary-enrollment-completion-rates.csv")
     };
 
     // Phase 1: Load main sections
@@ -27,7 +30,8 @@ async function init() {
         loadHtml('chapter3-container', 'html/components/chapter3.html'),
         loadHtml('about-container', 'html/components/about.html'),
         loadHtml('footer-container', 'html/components/footer.html'),
-        loadHtml('Alluvional-container', 'html/charts/Alluvional.html')
+        loadHtml('Alluvional-container', 'html/charts/Alluvional.html'),
+        loadHtml('chapter4-container', 'html/components/chapter4.html')
     ]);
 
     // Phase 2: Load charts inside sections (containers now exist)
@@ -36,7 +40,9 @@ async function init() {
         loadHtml('ChoroplethMap-render', 'html/charts/ChoroplethMap.html'),
         loadHtml('BoxPlot-render', 'html/charts/BoxPlot.html'),
         loadHtml('DumbbellPlot-render', 'html/charts/DumbbellPlot.html'),
-        loadHtml('StackedArea-render', 'html/charts/StackedArea.html')
+        loadHtml('StackedArea-render', 'html/charts/StackedArea.html'),
+        loadHtml('GroupedBarChart-render', 'html/charts/GroupedBarChart.html'),
+        loadHtml('StackedBarChart-render', 'html/charts/StackedBarChart.html')
     ]);
 
     document.getElementById('logo-button')?.addEventListener('click', (e) => {
@@ -55,6 +61,8 @@ async function init() {
     renderGraph('BoxPlot-render', renderBoxPlot, datasets);
     renderGraph('DumbbellPlot-render', renderDumbbellPlot, datasets);
     renderGraph('StackedArea-render', renderStackedArea, datasets);
+    renderGraph('GroupedBarChart-render', renderGroupedBarChart, datasets);
+    renderGraph('StackedBarChart-render', renderStackedBarChart, datasets);
 }
 
 document.addEventListener('DOMContentLoaded', init);
