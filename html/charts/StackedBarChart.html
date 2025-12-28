@@ -1,13 +1,25 @@
-<div class="chart-container">
-    <div class="chart-header">
-        <h3 class="chart-title">Education Completion Rates</h3>
-        <p class="chart-description">
-            Visualizing completion vs drop-off rates in primary and secondary education.
-        </p>
+<div id="stacked-bar-chart">
+    <div class="h5 pt-3 fw-bold text-center" style="color: var(--text-color);">
+        Education Completion Rates
+    </div>
+    <div class="h6 pt-2 mb-4 fw-bold text-center" style="color: var(--text-muted);">
+        Primary Education Completion vs Drop-off (Yemen)
     </div>
 
-    <div class="chart-content">
-        <div id="stacked-bar-legend" class="chart-legend"></div>
-        <svg id="stacked-bar-svg" width="100%" height="400" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="text-center mb-3">
+        <div id="stacked-bar-legend" style="display: inline-flex; gap: 24px; align-items: center;"></div>
+    </div>
+
+    <div class="stacked-bar-wrapper" style="position: relative; width: 100%; max-width: 100%; overflow: auto;">
+        <svg id="stacked-bar-svg" viewBox="0 0 960 450" preserveAspectRatio="xMidYMid meet"
+            style="display: block; width: 100%; height: auto; min-height: 450px;"></svg>
+    </div>
+
+    <div class="card-narrow">
+        <p class="mt-2 mb-0 pt-2 small text-start card-note">
+            This chart shows the completion rate of primary education in Yemen.
+            The "Completed" portion represents students who successfully finished primary school,
+            while "Incomplete" shows the estimated drop-off rate.
+        </p>
     </div>
 </div>
