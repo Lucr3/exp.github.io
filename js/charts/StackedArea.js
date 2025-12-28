@@ -11,7 +11,7 @@ export function renderStackedArea(container, datasets) {
     const MARGIN = { top: 30, right: 30, bottom: 50, left: 70 };
     const WIDTH = 960 - MARGIN.left - MARGIN.right;
     const HEIGHT = 450 - MARGIN.top - MARGIN.bottom;
-    const CURRENT_YEAR = 2024;
+    const CURRENT_YEAR = 2026;
     const COLORS = { births: '#69b3e7', deaths: '#e74c3c', positive: '#27ae60' };
 
     const data = datasets.BirthsDeaths
@@ -24,7 +24,7 @@ export function renderStackedArea(container, datasets) {
             const isProjection = !d['Deaths - Sex: all - Age: all - Variant: estimates'];
             return { year, deaths, births, isProjection };
         })
-        .filter(d => d.year && (d.deaths || d.births))
+        .filter(d => d.year && (d.deaths || d.births) && d.year <= 2030)
         .sort((a, b) => a.year - b.year);
 
     const fullDomain = d3.extent(data, d => d.year);
