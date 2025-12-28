@@ -9,6 +9,8 @@ import { renderDumbbellPlot } from './charts/DumbbellPlot.js';
 import { renderStackedArea } from './charts/StackedArea.js';
 import { renderGroupedBarChart } from './charts/GroupedBarChart.js';
 import { renderStackedBarChart } from './charts/StackedBarChart.js';
+import { renderSpiralChart } from './charts/SpiralChart.js';
+import { renderHistogram } from './charts/Histogram.js';
 
 async function init() {
     const datasets = {
@@ -18,7 +20,8 @@ async function init() {
         YemenPrices: await loadCSV("yemen_prices.csv"),
         YouthMortality: await loadCSV("youth-mortality-rate.csv"),
         BirthsDeaths: await loadCSV("births-and-deaths-projected-to-2100.csv"),
-        Education: await loadCSV("primary-secondary-enrollment-completion-rates.csv")
+        Education: await loadCSV("primary-secondary-enrollment-completion-rates.csv"),
+        GoogleTrends: await loadCSV("GoogleTrends.csv")
     };
 
     // Phase 1: Load main sections
@@ -31,7 +34,8 @@ async function init() {
         loadHtml('about-container', 'html/components/about.html'),
         loadHtml('footer-container', 'html/components/footer.html'),
         loadHtml('Alluvional-container', 'html/charts/Alluvional.html'),
-        loadHtml('chapter4-container', 'html/components/chapter4.html')
+        loadHtml('chapter4-container', 'html/components/chapter4.html'),
+        loadHtml('chapter5-container', 'html/components/chapter5.html')
     ]);
 
     // Phase 2: Load charts inside sections (containers now exist)
@@ -42,7 +46,9 @@ async function init() {
         loadHtml('DumbbellPlot-render', 'html/charts/DumbbellPlot.html'),
         loadHtml('StackedArea-render', 'html/charts/StackedArea.html'),
         loadHtml('GroupedBarChart-container', 'html/charts/GroupedBarChart.html'),
-        loadHtml('StackedBarChart-container', 'html/charts/StackedBarChart.html')
+        loadHtml('StackedBarChart-container', 'html/charts/StackedBarChart.html'),
+        loadHtml('SpiralChart-container', 'html/charts/SpiralChart.html'),
+        loadHtml('Histogram-container', 'html/charts/Histogram.html')
     ]);
 
     document.getElementById('logo-button')?.addEventListener('click', (e) => {
@@ -63,6 +69,8 @@ async function init() {
     renderGraph('StackedArea-render', renderStackedArea, datasets);
     renderGraph('GroupedBarChart-container', renderGroupedBarChart, datasets);
     renderGraph('StackedBarChart-container', renderStackedBarChart, datasets);
+    renderGraph('SpiralChart-container', renderSpiralChart, datasets);
+    renderGraph('Histogram-container', renderHistogram, datasets);
 }
 
 document.addEventListener('DOMContentLoaded', init);

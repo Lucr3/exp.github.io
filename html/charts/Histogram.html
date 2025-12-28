@@ -1,0 +1,25 @@
+<div id="histogram-chart">
+    <div class="h5 pt-3 fw-bold text-center" style="color: var(--text-color);">
+        Distribution of Search Interest
+    </div>
+    <div class="h6 pt-2 mb-4 fw-bold text-center" style="color: var(--text-muted);">
+        How Often Does Yemen Capture Global Attention?
+    </div>
+
+    <div class="text-center mb-3">
+        <div id="histogram-legend" style="display: inline-flex; gap: 24px; align-items: center;"></div>
+    </div>
+
+    <div class="histogram-wrapper" style="position: relative; width: 100%; max-width: 100%; overflow: auto;">
+        <svg id="histogram-svg" viewBox="0 0 960 450" preserveAspectRatio="xMidYMid meet"
+            style="display: block; width: 100%; height: auto; min-height: 400px;"></svg>
+    </div>
+
+    <div class="card-narrow">
+        <p class="mt-2 mb-0 pt-2 small text-start card-note">
+            This histogram shows the distribution of Google Trends interest scores (0-100).
+            A left-skewed distribution indicates consistently low attention with rare spikes.
+            A more even distribution suggests sustained interest over time.
+        </p>
+    </div>
+</div>
