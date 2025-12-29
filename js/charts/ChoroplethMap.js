@@ -1,8 +1,3 @@
-/**
- * Choropleth Map Chart - Costo del Cibo per Governatorato Yemen
- * Based on reference implementation pattern
- */
-
 export function renderChoroplethMap(container, datasets) {
     const root = d3.select(container);
     if (root.empty()) {
@@ -30,7 +25,6 @@ export function renderChoroplethMap(container, datasets) {
     let animationInterval = null;
     let isPlaying = false;
 
-    // Tooltip setup
     const TOOLTIP_ID = 'choropleth-tooltip';
     let tooltip = d3.select(`#${TOOLTIP_ID}`);
     if (tooltip.empty()) {
@@ -59,17 +53,15 @@ export function renderChoroplethMap(container, datasets) {
     const width = fullWidth - margin.left - margin.right;
     const height = fullHeight - margin.top - margin.bottom;
 
-    // Make SVG responsive using viewBox
     svg
         .attr('viewBox', `0 0 ${fullWidth} ${fullHeight}`)
         .attr('preserveAspectRatio', 'xMidYMid meet')
         .style('width', '100%')
         .style('height', 'auto')
-        .style('max-height', '70vh'); // Prevent it from being too tall on wide screens
+        .style('max-height', '70vh'); 
 
     svg.selectAll('g.chart-root, rect.background').remove();
 
-    // Add dark background like SymbolMap
     svg.append('rect')
         .attr('class', 'background')
         .attr('width', fullWidth)
@@ -82,7 +74,6 @@ export function renderChoroplethMap(container, datasets) {
         .attr('transform', `translate(${margin.left},${margin.top})`);
     const mapGroup = g.append('g').attr('class', 'map-group');
 
-    // Zoom setup
     const zoom = d3.zoom()
         .scaleExtent([1, 8])
         .translateExtent([[0, 0], [width, height]])
@@ -113,22 +104,12 @@ export function renderChoroplethMap(container, datasets) {
         });
     }
 
-    // Check for required data
-    if (!datasets.YemenPrices) {
-        console.error('Missing required dataset: YemenPrices');
-        return;
-    }
-
     const priceData = datasets.YemenPrices;
 
-    // Extract years from data
     const extractYear = dateStr => {
         if (!dateStr) return null;
-        // Handle potentially different date formats
         const parts = dateStr.includes('/') ? dateStr.split('/') : dateStr.split('-');
         if (parts.length === 3) {
-            // Assuming d/m/y or y-m-d, usually year is last or first. 
-            // Given previous code was index 2, let's try to find the 4-digit part.
             const fourDigit = parts.find(p => p.length === 4);
             return fourDigit ? +fourDigit : null;
         }
@@ -136,7 +117,7 @@ export function renderChoroplethMap(container, datasets) {
     };
 
     const years = [...new Set(priceData.map(d => extractYear(d['Price Date'])))]
-        .filter(y => y && y >= 2010 && y <= 2030) // Filter reasonable range
+        .filter(y => y && y >= 2010 && y <= 2030) 
         .sort((a, b) => a - b);
 
     if (years.length === 0) {
@@ -144,10 +125,8 @@ export function renderChoroplethMap(container, datasets) {
         return;
     }
 
-    // Get unique commodities
     const commodities = [...new Set(priceData.map(d => d.Commodity))].filter(c => c).sort();
 
-    // Populate commodity dropdown
     if (!commoditySelect.empty()) {
         commoditySelect.selectAll('option').remove();
         commodities.forEach(c => {
@@ -155,7 +134,6 @@ export function renderChoroplethMap(container, datasets) {
         });
     }
 
-    // Setup year slider
     if (!yearSlider.empty()) {
         yearSlider
             .attr('min', 0)
@@ -167,12 +145,9 @@ export function renderChoroplethMap(container, datasets) {
         yearLabel.text(years[years.length - 1]);
     }
 
-    // Name mapping for GeoJSON to CSV
-    // Name mapping for GeoJSON to CSV
-    // Key: GeoJSON name, Value: Array of possible CSV names
     const nameMapping = {
         "Sanʿaʾ": ["Sana'a", "Sanaa", "Amanat Al Asimah"],
-        "Sanʿaʾ Governorate": ["Sana'a", "Sanaa", "Amanat Al Asimah"], // Explicitly map Governorate version too
+        "Sanʿaʾ Governorate": ["Sana'a", "Sanaa", "Amanat Al Asimah"], 
         "Lahij Governorate": ["Lahj"],
         "'Adan Governorate": ["Aden"],
         "Ḥaḍramawt Governorate": ["Hadramaut", "Hadhramaut"],
@@ -198,23 +173,17 @@ export function renderChoroplethMap(container, datasets) {
     const normalizeGovName = (geoName) => {
         if (!geoName) return null;
         const cleanName = geoName.trim();
-
-        // 1. Check direct mapping
         if (nameMapping[cleanName]) return nameMapping[cleanName][0];
-
-        // 2. Check mapping with partial matches
         for (const [geoKey, csvVariants] of Object.entries(nameMapping)) {
-            // If the key is contained in the name (e.g. key "Lahij" in "Lahij Governorate")
             if (cleanName.includes(geoKey) || geoKey.includes(cleanName)) {
                 return csvVariants[0];
             }
         }
 
-        // 3. Fallback: simplify string
         let simple = cleanName
             .replace(' Governorate', '')
-            .replace(/[ʿʾ]/g, "'") // Replace glottal stops
-            .replace(/[āīūḥḍṭẓṣ]/g, (c) => { // Remove diacritics
+            .replace(/[ʿʾ]/g, "'") 
+            .replace(/[āīūḥḍṭẓṣ]/g, (c) => { 
                 const map = { 'ā': 'a', 'ī': 'i', 'ū': 'u', 'ḥ': 'h', 'ḍ': 'd', 'ṭ': 't', 'ẓ': 'z', 'ṣ': 's' };
                 return map[c] || c;
             });
@@ -222,7 +191,6 @@ export function renderChoroplethMap(container, datasets) {
         return simple;
     };
 
-    // Aggregate prices by Admin1
     const aggregatePrices = (commodity, year) => {
         const filtered = priceData.filter(d => {
             const dYear = extractYear(d['Price Date']);
@@ -233,7 +201,6 @@ export function renderChoroplethMap(container, datasets) {
         const byAdmin = new Map();
         filtered.forEach(d => {
             const admin = d['Admin 1']?.trim();
-            // Handle number parsing carefully (e.g. "1,200.50")
             let rawPrice = d.Price;
             if (typeof rawPrice === 'string') {
                 rawPrice = rawPrice.replace(/,/g, '');
@@ -241,10 +208,6 @@ export function renderChoroplethMap(container, datasets) {
             const price = +rawPrice;
 
             if (admin && !isNaN(price) && price > 0) {
-                // Normalize admin name from CSV side as well if needed, 
-                // but usually we match FROM GeoJSON TO CSV.
-                // Here we just store by the CSV name.
-
                 if (!byAdmin.has(admin)) {
                     byAdmin.set(admin, { sum: 0, count: 0 });
                 }
@@ -260,14 +223,11 @@ export function renderChoroplethMap(container, datasets) {
         return result;
     };
 
-    // Projection for Yemen
-    // Use fitSize to ensure the map is correctly scaled and centered based on the data
     const projection = d3.geoMercator();
     const path = d3.geoPath().projection(projection);
 
-    // Color gradient for prices - matching SymbolMap colors (yellow to red)
     const gradient = [
-        '#ffeaa7', // Light yellow (low prices)
+        '#ffeaa7', 
         '#fdcb6e',
         '#f9a825',
         '#f39c12',
@@ -275,7 +235,7 @@ export function renderChoroplethMap(container, datasets) {
         '#e74c3c',
         '#c0392b',
         '#a93226',
-        '#d63031'  // Deep red (high prices)
+        '#d63031'  
     ];
 
     const colorScale = d3.scaleThreshold()
@@ -311,14 +271,8 @@ export function renderChoroplethMap(container, datasets) {
         tooltip.style('opacity', 0).style('display', 'none');
     }
 
-    // Load local GeoJSON
     d3.json('datasets/yemen_admin1.geojson')
         .then(function (geoData) {
-            // FIX: Rewind GeoJSON - unconditionally reverse all rings
-            // The original GeoJSON has clockwise winding which causes D3 to render the exterior
-            // (the entire world minus the shape) instead of the interior.
-            // Reversing makes them counter-clockwise as D3 expects for exterior rings.
-
             geoData.features.forEach(feature => {
                 if (feature.geometry.type === "Polygon") {
                     feature.geometry.coordinates.forEach(ring => {
@@ -333,10 +287,8 @@ export function renderChoroplethMap(container, datasets) {
                 }
             });
 
-            // Fit projection to the data
             projection.fitSize([width, height], geoData);
 
-            // Build legend
             const legendData = [
                 { value: "≤100", color: gradient[0] },
                 { value: "100-199", color: gradient[1] },
@@ -389,7 +341,7 @@ export function renderChoroplethMap(container, datasets) {
                 x += groupWidth + gapBetweenTexts;
             });
 
-            // Center legend
+
             const totalLegendWidth = x - gapBetweenTexts;
             const startX = margin.left + Math.max(0, (width - totalLegendWidth) / 2);
             legend.attr('transform', `translate(${startX}, ${height + margin.top - 465})`);
@@ -401,7 +353,6 @@ export function renderChoroplethMap(container, datasets) {
                 const commodity = commoditySelect.empty() ? commodities[0] : commoditySelect.property('value');
                 const pricesByAdmin = aggregatePrices(commodity, selectedYear);
 
-                // Match GeoJSON features to CSV data
                 mapGroup.selectAll('path.governorate')
                     .data(geoData.features)
                     .join('path')
@@ -413,14 +364,11 @@ export function renderChoroplethMap(container, datasets) {
                         const geoName = d.properties.shapeName;
                         const csvName = normalizeGovName(geoName);
 
-                        // Try to find price in data
                         let price = null;
 
-                        // Direct lookup first (fastest)
                         if (csvName && pricesByAdmin.has(csvName)) {
                             price = pricesByAdmin.get(csvName);
                         } else {
-                            // Fuzzy lookup
                             for (const [admin, avgPrice] of pricesByAdmin.entries()) {
                                 if (csvName && (admin.toLowerCase() === csvName.toLowerCase() ||
                                     admin.toLowerCase().includes(csvName.toLowerCase()) ||
@@ -431,15 +379,12 @@ export function renderChoroplethMap(container, datasets) {
                             }
                         }
 
-                        if (price === null) {
-                            // console.debug(`No price for ${geoName} (mapped to ${csvName}) in ${selectedYear}`);
-                        }
 
-                        if (!price) return '#636e72'; // Grey for no data (matching SymbolMap)
+                        if (!price) return '#636e72';
                         return colorScale(price);
                     })
                     .selection()
-                    .attr('stroke', '#4a5459') // Grey stroke matching SymbolMap
+                    .attr('stroke', '#4a5459') 
                     .attr('stroke-width', 0.5)
                     .style('cursor', 'pointer')
                     .on('mouseenter', (event, d) => {
@@ -488,7 +433,6 @@ export function renderChoroplethMap(container, datasets) {
                         hideTooltip();
                     });
 
-                // Year label watermark
                 const yearLabelSelection = g.selectAll('.year-label')
                     .data([selectedYear]);
 
@@ -502,12 +446,12 @@ export function renderChoroplethMap(container, datasets) {
                     .append('text')
                     .attr('class', 'year-label')
                     .attr('x', width - 10)
-                    .attr('y', height - 80) // Moved higher to avoid Socotra
+                    .attr('y', height - 80)
                     .attr('text-anchor', 'end')
                     .attr('font-size', 48)
                     .attr('font-weight', 'bold')
                     .attr('fill', 'var(--text-color)')
-                    .style('pointer-events', 'none') // Allow mouse events to pass through to map
+                    .style('pointer-events', 'none')
                     .attr('opacity', 0)
                     .merge(yearLabelSelection)
                     .text(d => d)
@@ -516,17 +460,15 @@ export function renderChoroplethMap(container, datasets) {
                     .attr('opacity', 0.15);
             }
 
-            // Initial render
+
             update(years.length - 1);
 
-            // Slider event
             if (!yearSlider.empty()) {
                 yearSlider.on('input', function () {
                     update(+this.value);
                 });
             }
 
-            // Commodity change event
             if (!commoditySelect.empty()) {
                 commoditySelect.on('change', function () {
                     const yearIndex = yearSlider.empty() ? years.length - 1 : +yearSlider.property('value');
@@ -534,7 +476,6 @@ export function renderChoroplethMap(container, datasets) {
                 });
             }
 
-            // Speed slider
             if (!speedSlider.empty()) {
                 speedSlider.on('input', function () {
                     const speed = +this.value;
@@ -561,7 +502,6 @@ export function renderChoroplethMap(container, datasets) {
                 }, speed);
             }
 
-            // Play button
             if (!playBtn.empty()) {
                 playBtn.on('click', function () {
                     if (isPlaying) {

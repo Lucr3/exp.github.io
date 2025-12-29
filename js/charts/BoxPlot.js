@@ -16,7 +16,6 @@ export function renderBoxPlot(container, datasets) {
     return;
   }
 
-  // Commodity categorization
   const FUEL_KEYWORDS = ['diesel', 'petrol', 'benzina', 'kerosene', 'fuel', 'gas'];
   const ESSENTIAL_KEYWORDS = ['farina', 'flour', 'uova', 'eggs', 'riso', 'rice', 'fagioli', 'beans', 'pane', 'bread', 'pane', 'zucchero', 'sugar', 'sale', 'salt', 'olio', 'oil', 'latte', 'milk', 'burro', 'butter'];
 
@@ -27,7 +26,6 @@ export function renderBoxPlot(container, datasets) {
     return 'other';
   }
 
-  // Get CSS variables for theme colors
   const rootElement = document.documentElement;
   const computedStyle = getComputedStyle(rootElement);
   const textColor = computedStyle.getPropertyValue('--text-color').trim() || '#000';
@@ -37,10 +35,8 @@ export function renderBoxPlot(container, datasets) {
   const WIDTH = 960 - MARGIN.left - MARGIN.right;
   const HEIGHT = 500 - MARGIN.top - MARGIN.bottom;
 
-  // Store raw price data for detail view
   let allPriceData = [];
 
-  // Function to render the boxplot with filtered data
   function updateBoxPlot(filterCategory = 'all') {
     svg.selectAll('g.chart-root').remove();
     const g = svg
@@ -48,7 +44,6 @@ export function renderBoxPlot(container, datasets) {
       .attr('class', 'chart-root')
       .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
-    // Parse data
     let priceData = datasets.YemenPrices
       .map(d => ({
         commodity: d['Commodity']?.trim() || '',
@@ -59,10 +54,8 @@ export function renderBoxPlot(container, datasets) {
       }))
       .filter(d => d.commodity && d.price > 0);
 
-    // Store for detail view
     allPriceData = priceData;
 
-    // Apply filter
     if (filterCategory !== 'all') {
       priceData = priceData.filter(d => d.category === filterCategory);
     }
@@ -78,7 +71,6 @@ export function renderBoxPlot(container, datasets) {
       return;
     }
 
-    // Group by commodity
     const commoditiesMap = new Map();
     priceData.forEach(d => {
       if (!commoditiesMap.has(d.commodity)) {
@@ -87,7 +79,6 @@ export function renderBoxPlot(container, datasets) {
       commoditiesMap.get(d.commodity).push(d);
     });
 
-    // Calculate quartiles for each commodity
     const boxplotData = Array.from(commoditiesMap.entries())
       .map(([commodity, items]) => {
         const prices = items.map(d => d.price);
@@ -116,7 +107,6 @@ export function renderBoxPlot(container, datasets) {
       })
       .sort((a, b) => a.commodity.localeCompare(b.commodity));
 
-    // Scales - Y scale limited to whisker range
     const xScale = d3.scaleBand()
       .domain(boxplotData.map(d => d.commodity))
       .range([0, WIDTH])
@@ -126,7 +116,6 @@ export function renderBoxPlot(container, datasets) {
       .domain([0, d3.max(boxplotData, d => d.whiskerHigh) * 1.15])
       .range([HEIGHT, 0]);
 
-    // Tooltip
     const TOOLTIP_ID = 'boxplot-tooltip';
     let tooltip = d3.select(`#${TOOLTIP_ID}`);
     if (tooltip.empty()) {
@@ -160,7 +149,6 @@ export function renderBoxPlot(container, datasets) {
     const hideTooltip = () => tooltip.style('opacity', 0).style('display', 'none');
     const formatNum = d3.format(',');
 
-    // Draw boxplots
     const boxes = g.selectAll('.boxplot')
       .data(boxplotData)
       .enter()
@@ -176,7 +164,6 @@ export function renderBoxPlot(container, datasets) {
       .attr('transform', d => `translate(${xScale(d.commodity) + xScale.bandwidth() / 2},0)`)
       .attr('opacity', 1);
 
-    // Whiskers (lines)
     boxes.append('line')
       .attr('class', 'whisker')
       .attr('x1', 0)
@@ -187,7 +174,6 @@ export function renderBoxPlot(container, datasets) {
       .attr('stroke-width', 1.5)
       .attr('opacity', 0.6);
 
-    // Whisker caps
     boxes.append('line')
       .attr('x1', -8)
       .attr('x2', 8)
@@ -206,7 +192,6 @@ export function renderBoxPlot(container, datasets) {
       .attr('stroke-width', 1.5)
       .attr('opacity', 0.6);
 
-    // Box (IQR)
     const boxWidth = Math.min(40, xScale.bandwidth() * 0.8);
     boxes.append('rect')
       .attr('class', 'box')
@@ -245,7 +230,6 @@ export function renderBoxPlot(container, datasets) {
         openDetailModal(d, allPriceData);
       });
 
-    // Median line
     boxes.append('line')
       .attr('class', 'median')
       .attr('x1', -boxWidth / 2)
@@ -256,7 +240,6 @@ export function renderBoxPlot(container, datasets) {
       .attr('stroke-width', 2)
       .style('pointer-events', 'none');
 
-    // MINIMAL: Only show median value label
     boxes.append('text')
       .attr('x', boxWidth / 2 + 6)
       .attr('y', d => yScale(d.median))
@@ -266,7 +249,6 @@ export function renderBoxPlot(container, datasets) {
       .style('font-weight', 'bold')
       .text(d => formatNum(Math.round(d.median)));
 
-    // MINIMAL: Small outlier indicator (just a number badge)
     boxes.filter(d => d.outliers.length > 0)
       .append('g')
       .attr('class', 'outlier-indicator')
@@ -299,7 +281,6 @@ export function renderBoxPlot(container, datasets) {
         openDetailModal(d, allPriceData);
       });
 
-    // X-axis labels (commodity names) - rotated for readability
     boxes.append('text')
       .attr('x', 0)
       .attr('y', HEIGHT + 12)
@@ -311,10 +292,6 @@ export function renderBoxPlot(container, datasets) {
 
   }
 
-  // ========================================
-  // DETAIL MODAL - MINIMAL VERSION
-  // ========================================
-
   function openDetailModal(boxData, allPriceData) {
     d3.select('#boxplot-detail-modal').remove();
 
@@ -325,7 +302,6 @@ export function renderBoxPlot(container, datasets) {
     const textMut = computedStyle.getPropertyValue('--text-muted').trim() || '#D9D9D6';
     const borderCol = computedStyle.getPropertyValue('--border-color').trim() || '#3d4555';
 
-    // Create modal
     const modal = d3.select('body')
       .append('div')
       .attr('id', 'boxplot-detail-modal')
@@ -351,7 +327,6 @@ export function renderBoxPlot(container, datasets) {
       .style('overflow', 'auto')
       .style('box-shadow', '0 20px 60px rgba(0,0,0,0.5)');
 
-    // Header - minimal
     const header = modalContent.append('div')
       .style('display', 'flex')
       .style('justify-content', 'space-between')
@@ -379,7 +354,6 @@ export function renderBoxPlot(container, datasets) {
       .on('mouseenter', function () { d3.select(this).style('color', '#e74c3c'); })
       .on('mouseleave', function () { d3.select(this).style('color', textMut); });
 
-    // Stats - minimal horizontal bar
     const formatNum = d3.format(',');
     const statsBar = modalContent.append('div')
       .style('display', 'flex')
@@ -403,13 +377,11 @@ export function renderBoxPlot(container, datasets) {
         .html(`<span style="color:${textMut}">${stat.label}:</span> <strong style="color:${stat.color}">${stat.value}</strong>`);
     });
 
-    // Chart container - single chart, full width
     const chartsContainer = modalContent.append('div')
       .style('padding', '16px');
 
     const commodityData = allPriceData.filter(d => d.commodity === boxData.commodity);
 
-    // Distribution chart (histogram + boxplot)
     const boxPanel = chartsContainer.append('div')
       .style('background', bgColor)
       .style('border-radius', '8px')
@@ -429,7 +401,6 @@ export function renderBoxPlot(container, datasets) {
 
     renderCombinedChart(boxSvg, boxData, commodityData, textCol, textMut);
 
-    // Animate in
     requestAnimationFrame(() => modal.style('opacity', '1'));
 
     modal.on('click', (event) => {
@@ -449,7 +420,6 @@ export function renderBoxPlot(container, datasets) {
     }
   }
 
-  // Combined box plot + histogram
   function renderCombinedChart(svg, data, rawData, textCol, textMut) {
     const margin = { top: 20, right: 30, bottom: 35, left: 55 };
     const width = 800 - margin.left - margin.right;
@@ -459,12 +429,10 @@ export function renderBoxPlot(container, datasets) {
       .attr('transform', `translate(${margin.left},${margin.top})`);
     const prices = rawData.map(d => d.price);
 
-    // X scale for prices
     const xScale = d3.scaleLinear()
       .domain([d3.min(prices) * 0.9, d3.max(prices) * 1.05])
       .range([0, width]);
 
-    // Histogram
     const histogram = d3.histogram()
       .value(d => d)
       .domain(xScale.domain())
@@ -476,7 +444,6 @@ export function renderBoxPlot(container, datasets) {
       .domain([0, d3.max(bins, d => d.length)])
       .range([height, 0]);
 
-    // Tooltip for histogram
     const HIST_TOOLTIP_ID = 'histogram-tooltip';
     let histTooltip = d3.select(`#${HIST_TOOLTIP_ID}`);
     if (histTooltip.empty()) {
@@ -498,12 +465,10 @@ export function renderBoxPlot(container, datasets) {
 
     const formatNum = d3.format(',');
 
-    // Helper to determine if a bin is in outlier range
     const isOutlierBin = (bin) => bin.x1 <= data.whiskerLow || bin.x0 >= data.whiskerHigh;
     const getBarColor = (bin) => isOutlierBin(bin) ? '#e74c3c' : '#69b3e7';
     const getBarHoverColor = (bin) => isOutlierBin(bin) ? '#f5756a' : '#8fc9f0';
 
-    // Bars with tooltips
     g.selectAll('.bar')
       .data(bins)
       .enter()
@@ -551,7 +516,6 @@ export function renderBoxPlot(container, datasets) {
       .attr('y', d => yScale(d.length))
       .attr('height', d => height - yScale(d.length));
 
-    // Median line (vertical reference)
     g.append('line')
       .attr('x1', xScale(data.median))
       .attr('x2', xScale(data.median))
@@ -562,7 +526,6 @@ export function renderBoxPlot(container, datasets) {
       .attr('stroke-dasharray', '4,3')
       .attr('opacity', 0.8);
 
-    // Median label
     g.append('text')
       .attr('x', xScale(data.median) + 6)
       .attr('y', 12)
@@ -571,7 +534,6 @@ export function renderBoxPlot(container, datasets) {
       .style('font-weight', 'bold')
       .text(`Median: ${formatNum(Math.round(data.median))}`);
 
-    // X axis (no domain line)
     g.append('g')
       .attr('transform', `translate(0,${height})`)
       .call(d3.axisBottom(xScale).ticks(8).tickFormat(d3.format(',')))
@@ -579,7 +541,6 @@ export function renderBoxPlot(container, datasets) {
       .style('font-size', '10px')
       .style('color', textMut);
 
-    // X axis label
     g.append('text')
       .attr('x', width / 2)
       .attr('y', height + 30)
@@ -588,18 +549,16 @@ export function renderBoxPlot(container, datasets) {
       .style('fill', textMut)
       .text('Price (YER)');
 
-    // Y axis (with grid lines)
     g.append('g')
       .call(d3.axisLeft(yScale).ticks(5).tickSize(-width))
       .call(g => g.select('.domain').remove())
       .call(g => g.selectAll('.tick line')
         .attr('stroke', textMut)
         .attr('stroke-opacity', 0.2)
-        .attr('stroke-dasharray', '2,2')) // Optional: make it distinct from other lines
+        .attr('stroke-dasharray', '2,2')) 
       .style('font-size', '10px')
       .style('color', textMut);
 
-    // Y axis label
     g.append('text')
       .attr('transform', 'rotate(-90)')
       .attr('x', -height / 2)
@@ -610,7 +569,6 @@ export function renderBoxPlot(container, datasets) {
       .text('Frequency');
   }
 
-  // Temporal line chart
   function renderTemporalChart(svg, data, textCol, textMut) {
     const margin = { top: 15, right: 15, bottom: 25, left: 45 };
     const width = 380 - margin.left - margin.right;
@@ -651,7 +609,6 @@ export function renderBoxPlot(container, datasets) {
       .domain([0, d3.max(monthlyData, d => d.price) * 1.1])
       .range([height, 0]);
 
-    // Area
     const area = d3.area()
       .x(d => xScale(d.date))
       .y0(height)
@@ -663,7 +620,6 @@ export function renderBoxPlot(container, datasets) {
       .attr('d', area)
       .attr('fill', 'rgba(105, 179, 231, 0.2)');
 
-    // Line
     const line = d3.line()
       .x(d => xScale(d.date))
       .y(d => yScale(d.price))
@@ -676,7 +632,6 @@ export function renderBoxPlot(container, datasets) {
       .attr('stroke', '#69b3e7')
       .attr('stroke-width', 2);
 
-    // Axes
     g.append('g')
       .attr('transform', `translate(0,${height})`)
       .call(d3.axisBottom(xScale).ticks(4).tickFormat(d3.timeFormat('%b %y')))
@@ -689,10 +644,8 @@ export function renderBoxPlot(container, datasets) {
       .style('color', textMut);
   }
 
-  // Initial render
   updateBoxPlot('all');
 
-  // Event listener for filter changes
   const filterSelect = root.select('#commodity-filter');
   if (!filterSelect.empty()) {
     filterSelect.on('change', function () {
