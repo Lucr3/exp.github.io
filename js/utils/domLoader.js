@@ -1,14 +1,16 @@
+import { CACHE_VERSION } from '../config.js';
+
 export async function loadHtml(id, path) {
 
-        const response = await fetch(path);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const text = await response.text();
-        const element = document.getElementById(id);
-        if (element) {
-            element.innerHTML = text;
-        } else {
-            console.warn(`Container con id '${id}' non trovato`);
-        }
+  const response = await fetch(`${path}?v=${CACHE_VERSION}`);
+  if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+  const text = await response.text();
+  const element = document.getElementById(id);
+  if (element) {
+    element.innerHTML = text;
+  } else {
+    console.warn(`Container con id '${id}' non trovato`);
+  }
 
 }
 
