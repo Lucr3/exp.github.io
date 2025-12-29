@@ -188,16 +188,17 @@ export function renderSpiralChart(container, datasets) {
     years.filter((_, i) => i % 3 === 0 || i === numYears - 1).forEach((year, idx) => {
         const yearIndex = years.indexOf(year);
         const radius = radiusScale(yearIndex);
-        const angle = angleScale(1) - Math.PI / 2;
+        const angle = -Math.PI / 2;
 
         g.append('text')
-            .attr('x', (radius + 15) * Math.cos(angle))
-            .attr('y', (radius + 15) * Math.sin(angle))
+            .attr('x', radius * Math.cos(angle))
+            .attr('y', radius * Math.sin(angle))
             .attr('text-anchor', 'start')
             .attr('dominant-baseline', 'middle')
-            .style('fill', textColor)
-            .style('font-size', '10px')
+            .style('fill', '#ffffff')
+            .style('font-size', '12px')
             .style('font-weight', 'bold')
+            .style('text-shadow', '0 0 3px rgba(0,0,0,0.7), 0 0 6px rgba(0,0,0,0.5)')
             .text(year);
     });
 
