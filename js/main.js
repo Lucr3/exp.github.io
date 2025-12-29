@@ -4,9 +4,8 @@ import { renderGraph } from './utils/domLoader.js';
 import { renderSymbolMap } from './charts/SymbolMap.js';
 import { renderAlluvional } from './charts/Alluvional.js';
 
-// Protezione da errori di devtools
 if (typeof window !== 'undefined' && window.__chromium_devtools_metrics_reporter === undefined) {
-    window.__chromium_devtools_metrics_reporter = () => {};
+    window.__chromium_devtools_metrics_reporter = () => { };
 }
 import { renderChoroplethMap } from './charts/ChoroplethMap.js';
 import { renderBoxPlot } from './charts/BoxPlot.js';
@@ -29,7 +28,6 @@ async function init() {
         GoogleTrends: await loadCSV("GoogleTrends.csv")
     };
 
-    // Phase 1: Load main sections
     await Promise.all([
         loadHtml('navbar-container', 'html/components/navbar.html'),
         loadHtml('intro-container', 'html/components/intro.html'),
@@ -43,7 +41,6 @@ async function init() {
         loadHtml('chapter5-container', 'html/components/chapter5.html')
     ]);
 
-    // Phase 2: Load charts inside sections (containers now exist)
     await Promise.all([
         loadHtml('SymbolMap-container', 'html/charts/SymbolMap.html'),
         loadHtml('ChoroplethMap-render', 'html/charts/ChoroplethMap.html'),
