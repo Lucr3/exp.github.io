@@ -1,0 +1,34 @@
+<div id="boxplot-chart">
+    <div class="h5 pt-3 fw-bold text-center" style="color: var(--text-color);">
+        Price Distribution by Commodity
+    </div>
+    <div class="h6 pt-2 mb-4 fw-bold text-center" style="color: var(--text-muted);">
+        Box Plot of Prices (YER/KG) in Yemen
+    </div>
+
+    <div class="text-center mb-3">
+        <label for="commodity-filter" class="form-label fw-bold" style="color: var(--text-color);">Filter by
+            category:</label>
+        <select id="commodity-filter" class="form-select form-select-sm"
+            style="max-width: 300px; margin: 0 auto; color: var(--text-color); background-color: var(--card-background); border-color: var(--border-color);">
+            <option value="all">All Products</option>
+            <option value="fuel">Fuel</option>
+            <option value="essential">Essential Goods</option>
+            <option value="other">Other</option>
+        </select>
+    </div>
+
+    <div class="boxplot-wrapper" style="position: relative; width: 100%; max-width: 100%; overflow: auto;">
+        <svg id="boxplot-svg" viewBox="0 0 960 600" preserveAspectRatio="xMidYMid meet"
+            style="display: block; width: 100%; height: auto; min-height: 600px;"></svg>
+    </div>
+
+    <div class="card-narrow">
+        <p class="mt-2 mb-0 pt-2 small text-start card-note">
+            This box plot shows the price distribution for each commodity type in Yemen.
+            The blue box represents the interquartile range (Q1-Q3), the red line is the median,
+            the vertical lines are whiskers (range without outliers), and red dots indicate outliers.
+            Hover over elements to view detailed values. Click on a box to see the full distribution.
+        </p>
+    </div>
+</div>

@@ -1,0 +1,41 @@
+<div id="stacked-area-chart">
+    <div class="h5 pt-3 fw-bold text-center" style="color: var(--text-color);">
+        Births vs Deaths Over Time
+    </div>
+    <div class="h6 pt-2 mb-4 fw-bold text-center" style="color: var(--text-muted);">
+        Demographic Evolution in Yemen (1950-2100)
+    </div>
+
+    <div class="text-center mb-3">
+        <div style="display: inline-flex; gap: 24px; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="width: 16px; height: 16px; background: #69b3e7; border-radius: 3px;"></span>
+                <span style="color: var(--text-color); font-size: 13px;">Births</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="width: 16px; height: 16px; background: #e74c3c; border-radius: 3px;"></span>
+                <span style="color: var(--text-color); font-size: 13px;">Deaths</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="width: 16px; height: 3px; background: var(--text-muted); opacity: 0.5;"></span>
+                <span
+                    style="width: 16px; height: 3px; background: var(--text-muted); opacity: 0.5; margin-left: -12px;"></span>
+                <span style="color: var(--text-muted); font-size: 13px; margin-left: 4px;">Projections</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="stacked-area-wrapper" style="position: relative; width: 100%; max-width: 100%; overflow: auto;">
+        <svg id="stacked-area-svg" viewBox="0 0 960 450" preserveAspectRatio="xMidYMid meet"
+            style="display: block; width: 100%; height: auto; min-height: 450px;"></svg>
+    </div>
+
+    <div class="card-narrow">
+        <p class="mt-2 mb-0 pt-2 small text-start card-note">
+            This chart shows the demographic evolution in Yemen from 1950 to 2100.
+            Historical data (solid) is shown until 2023, with projected data (lighter) extending to 2100.
+            The vertical dashed line marks the present year (2024).
+            Hover over the chart to see detailed values for each year.
+        </p>
+    </div>
+</div>
