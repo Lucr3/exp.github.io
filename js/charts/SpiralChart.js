@@ -80,7 +80,7 @@ export function renderSpiralChart(container, datasets) {
             .attr('r', radius)
             .attr('fill', 'none')
             .attr('stroke', textMuted)
-            .attr('stroke-opacity', 0.3) // Increased opacity slightly for visibility with var
+            .attr('stroke-opacity', 0.3)
             .attr('stroke-dasharray', '2,4');
     });
 
