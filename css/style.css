@@ -534,7 +534,6 @@ footer {
     background-color: var(--primary-color);
     padding: var(--spacing-lg) 0;
     text-align: center;
-    border-top: 1px solid var(--border-color);
 }
 
 footer p {
