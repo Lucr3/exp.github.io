@@ -58,7 +58,7 @@ export function renderChoroplethMap(container, datasets) {
         .attr('preserveAspectRatio', 'xMidYMid meet')
         .style('width', '100%')
         .style('height', 'auto')
-        .style('max-height', '70vh'); 
+        .style('max-height', '70vh');
 
     svg.selectAll('g.chart-root, rect.background').remove();
 
@@ -117,7 +117,7 @@ export function renderChoroplethMap(container, datasets) {
     };
 
     const years = [...new Set(priceData.map(d => extractYear(d['Price Date'])))]
-        .filter(y => y && y >= 2010 && y <= 2030) 
+        .filter(y => y && y >= 2010 && y <= 2030)
         .sort((a, b) => a - b);
 
     if (years.length === 0) {
@@ -147,7 +147,7 @@ export function renderChoroplethMap(container, datasets) {
 
     const nameMapping = {
         "Sanʿaʾ": ["Sana'a", "Sanaa", "Amanat Al Asimah"],
-        "Sanʿaʾ Governorate": ["Sana'a", "Sanaa", "Amanat Al Asimah"], 
+        "Sanʿaʾ Governorate": ["Sana'a", "Sanaa", "Amanat Al Asimah"],
         "Lahij Governorate": ["Lahj"],
         "'Adan Governorate": ["Aden"],
         "Ḥaḍramawt Governorate": ["Hadramaut", "Hadhramaut"],
@@ -182,8 +182,8 @@ export function renderChoroplethMap(container, datasets) {
 
         let simple = cleanName
             .replace(' Governorate', '')
-            .replace(/[ʿʾ]/g, "'") 
-            .replace(/[āīūḥḍṭẓṣ]/g, (c) => { 
+            .replace(/[ʿʾ]/g, "'")
+            .replace(/[āīūḥḍṭẓṣ]/g, (c) => {
                 const map = { 'ā': 'a', 'ī': 'i', 'ū': 'u', 'ḥ': 'h', 'ḍ': 'd', 'ṭ': 't', 'ẓ': 'z', 'ṣ': 's' };
                 return map[c] || c;
             });
@@ -227,7 +227,7 @@ export function renderChoroplethMap(container, datasets) {
     const path = d3.geoPath().projection(projection);
 
     const gradient = [
-        '#ffeaa7', 
+        '#ffeaa7',
         '#fdcb6e',
         '#f9a825',
         '#f39c12',
@@ -235,7 +235,7 @@ export function renderChoroplethMap(container, datasets) {
         '#e74c3c',
         '#c0392b',
         '#a93226',
-        '#d63031'  
+        '#d63031'
     ];
 
     const colorScale = d3.scaleThreshold()
@@ -384,7 +384,7 @@ export function renderChoroplethMap(container, datasets) {
                         return colorScale(price);
                     })
                     .selection()
-                    .attr('stroke', '#4a5459') 
+                    .attr('stroke', '#4a5459')
                     .attr('stroke-width', 0.5)
                     .style('cursor', 'pointer')
                     .on('mouseenter', (event, d) => {
@@ -403,9 +403,9 @@ export function renderChoroplethMap(container, datasets) {
                         showTooltip(
                             event,
                             `<div style="text-align: center;"><strong>${geoName}</strong></div>` +
-                            `<strong>Anno:</strong> ${selectedYear}<br/>` +
+                            `<strong>Year:</strong> ${selectedYear}<br/>` +
                             `<strong>Commodity:</strong> ${commodity}<br/>` +
-                            `<strong>Prezzo Medio:</strong> ${price ? formatNum(price) + ' YER' : 'N/A'}`
+                            `<strong>Average Price:</strong> ${price ? formatNum(price) + ' YER' : 'N/A'}`
                         );
                     })
                     .on('mousemove', (event, d) => {
@@ -424,9 +424,9 @@ export function renderChoroplethMap(container, datasets) {
                         showTooltip(
                             event,
                             `<div style="text-align: center;"><strong>${geoName}</strong></div>` +
-                            `<strong>Anno:</strong> ${selectedYear}<br/>` +
+                            `<strong>Year:</strong> ${selectedYear}<br/>` +
                             `<strong>Commodity:</strong> ${commodity}<br/>` +
-                            `<strong>Prezzo Medio:</strong> ${price ? formatNum(price) + ' YER' : 'N/A'}`
+                            `<strong>Average Price:</strong> ${price ? formatNum(price) + ' YER' : 'N/A'}`
                         );
                     })
                     .on('mouseleave', () => {
@@ -528,6 +528,6 @@ export function renderChoroplethMap(container, datasets) {
                 .attr('text-anchor', 'middle')
                 .attr('font-size', 16)
                 .attr('fill', 'var(--text-muted)')
-                .text('Errore nel caricamento della mappa');
+                .text('Error loading map');
         });
 }

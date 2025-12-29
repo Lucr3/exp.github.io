@@ -111,7 +111,7 @@ export function renderAlluvional(container, datasets) {
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '16px')
                 .attr('fill', getTextColor())
-                .text('Nessun dato disponibile per questo intervallo di anni');
+                .text('No data available for this year range');
             return;
         }
 
@@ -298,8 +298,8 @@ export function renderAlluvional(container, datasets) {
             const outgoingLinks = sankeyData.links.filter(l => l.source.id === d.id);
             const levelNames = ['Subgroup', 'Type', 'Subtype', 'Event'];
             let content = `<div style="text-align: center; margin-bottom: 8px;"><strong>${d.name}</strong></div>
-                <strong>Livello:</strong> ${levelNames[d.level]}<br>
-                <strong>Totale Eventi:</strong> ${d3.format(',')(totalValue)}`;
+                <strong>Level:</strong> ${levelNames[d.level]}<br>
+                <strong>Total Events:</strong> ${d3.format(',')(totalValue)}`;
             if (outgoingLinks.length > 0) {
                 content += '<hr style="margin: 8px 0; border: 0; border-top: 1px solid rgba(255,255,255,0.3);">';
                 outgoingLinks.forEach((l, idx) => {
