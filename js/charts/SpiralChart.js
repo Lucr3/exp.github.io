@@ -1,6 +1,3 @@
-// Spiral Chart for Google Trends Interest
-// Dataset: GoogleTrends.csv
-// Shows temporal cycles of interest in Yemen - each ring = 1 year, position = month
 
 export function renderSpiralChart(container, datasets) {
     const root = d3.select(container);
@@ -9,11 +6,11 @@ export function renderSpiralChart(container, datasets) {
 
     if (root.empty() || svg.empty() || !datasets.GoogleTrends) return;
 
-    // --- 1. Theme & Constants ---
-    const style = getComputedStyle(document.documentElement);
-    const textColor = style.getPropertyValue('--text-color').trim() || '#eaeaea';
-    const textMuted = style.getPropertyValue('--text-muted').trim() || '#D9D9D6';
-    const bgColor = style.getPropertyValue('--background-color').trim() || '#0C1117';
+
+    const textColor = 'var(--text-color)';
+    const textMuted = 'var(--text-muted)';
+    const bgColor = 'var(--background-color)';
+
 
     const WIDTH = 800;
     const HEIGHT = 800;
@@ -83,7 +80,7 @@ export function renderSpiralChart(container, datasets) {
             .attr('r', radius)
             .attr('fill', 'none')
             .attr('stroke', textMuted)
-            .attr('stroke-opacity', 0.15)
+            .attr('stroke-opacity', 0.3) // Increased opacity slightly for visibility with var
             .attr('stroke-dasharray', '2,4');
     });
 
@@ -98,7 +95,7 @@ export function renderSpiralChart(container, datasets) {
             .attr('x1', x1).attr('y1', y1)
             .attr('x2', x2).attr('y2', y2)
             .attr('stroke', textMuted)
-            .attr('stroke-opacity', 0.1);
+            .attr('stroke-opacity', 0.2);
 
         const labelRadius = OUTER_RADIUS + 20;
         const lx = labelRadius * Math.cos(angle);
