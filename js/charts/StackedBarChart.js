@@ -1,6 +1,4 @@
-// 100% Stacked Bar Chart for Education Completion Rates
-// Dataset: primary-secondary-enrollment-completion-rates.csv
-// Shows completion vs drop-off rates over time
+
 
 export function renderStackedBarChart(container, datasets) {
     const root = d3.select(container);
@@ -9,31 +7,25 @@ export function renderStackedBarChart(container, datasets) {
 
     if (root.empty() || svg.empty() || !datasets.Education) return;
 
-    // --- 1. Theme & Logic Setup ---
     const style = getComputedStyle(document.documentElement);
     const textColor = style.getPropertyValue('--text-color').trim() || '#eaeaea';
     const textMuted = style.getPropertyValue('--text-muted').trim() || '#D9D9D6';
     const gridColor = style.getPropertyValue('--border-color').trim() || '#444';
 
-    // Colors: Completed (Blue), Incomplete (Orange)
     const COLORS = {
         Completed: '#0173B2',
         Incomplete: '#DE8F05'
     };
 
-    // Standardized margins matching GroupedBarChart/StackedArea
     const MARGIN = { top: 40, right: 30, bottom: 60, left: 60 };
-    const WIDTH = 960 - MARGIN.left - MARGIN.right; // Fixed internal reference width
+    const WIDTH = 960 - MARGIN.left - MARGIN.right;
     const HEIGHT = 450 - MARGIN.top - MARGIN.bottom;
 
-    // Set viewBox to ensuring scaling
     svg.attr('viewBox', `0 0 960 450`)
         .attr('preserveAspectRatio', 'xMidYMid meet')
         .style('width', '100%')
         .style('height', 'auto');
 
-    // --- 2. Data Processing ---
-    // Filter for Yemen and valid Primary Completion Rate
     const rawData = datasets.Education.filter(d =>
         d.Entity === 'Yemen' &&
         d['Completion rate, primary education, both sexes (%), CR.1']
@@ -53,7 +45,6 @@ export function renderStackedBarChart(container, datasets) {
     const subgroups = ['Completed', 'Incomplete'];
     const years = data.map(d => d.year);
 
-    // --- 3. Scales ---
     const x = d3.scaleBand()
         .domain(years)
         .range([0, WIDTH])
@@ -67,14 +58,13 @@ export function renderStackedBarChart(container, datasets) {
         .domain(subgroups)
         .range([COLORS.Completed, COLORS.Incomplete]);
 
-    // --- 4. Draw ---
     svg.selectAll('*').remove();
-    legendContainer.html(''); // Clear legend
+    legendContainer.html('');
 
     const g = svg.append('g')
         .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
-    // Grid
+
     g.append('g')
         .attr('class', 'grid')
         .call(d3.axisLeft(y)
@@ -83,24 +73,22 @@ export function renderStackedBarChart(container, datasets) {
             .ticks(5)
         )
         .style('stroke', gridColor)
-        .style('stroke-opacity', 0.1) // Lighter grid
-        .style('stroke-dasharray', '3,3') // Dashed grid
+        .style('stroke-opacity', 0.1)
+        .style('stroke-dasharray', '3,3')
         .select('.domain').remove();
 
-    // Stack the data
     const stackedData = d3.stack()
         .keys(subgroups)
         (data);
 
-    // Bars
-    // Add a group for each subgroup
+
     const layers = g.append('g')
         .selectAll('g')
         .data(stackedData)
         .join('g')
         .attr('fill', d => color(d.key));
 
-    // Add rects for each layer
+
     layers.selectAll('rect')
         .data(d => d)
         .join('rect')
@@ -132,7 +120,6 @@ export function renderStackedBarChart(container, datasets) {
             hideTooltip();
         });
 
-    // Axis
     g.append('g')
         .attr('transform', `translate(0,${HEIGHT})`)
         .call(d3.axisBottom(x).tickSize(0).tickPadding(15))
@@ -151,7 +138,7 @@ export function renderStackedBarChart(container, datasets) {
         .style('fill', textMuted)
         .style('font-size', '11px');
 
-    // Labels on bars
+
     stackedData.forEach(layer => {
         g.selectAll(`.label-${layer.key}`)
             .data(layer)
@@ -165,7 +152,7 @@ export function renderStackedBarChart(container, datasets) {
             .style('font-size', '12px')
             .style('font-weight', 'bold')
             .style('pointer-events', 'none')
-            // Drop shadow for better readability
+
             .style('text-shadow', '0px 1px 3px rgba(0,0,0,0.5)')
             .text(d => {
                 const val = d[1] - d[0];
@@ -173,7 +160,6 @@ export function renderStackedBarChart(container, datasets) {
             });
     });
 
-    // Title / Annotations
     g.append('text')
         .attr('x', WIDTH / 2)
         .attr('y', -15)
@@ -183,7 +169,7 @@ export function renderStackedBarChart(container, datasets) {
         .style('font-weight', 'bold')
         .text('Primary Education Completion Rate (Yemen)');
 
-    // Legend (HTML based matching StackedArea style)
+
     subgroups.forEach(key => {
         const item = legendContainer.append('div')
             .style('display', 'flex')
@@ -202,7 +188,7 @@ export function renderStackedBarChart(container, datasets) {
             .text(key);
     });
 
-    // Tooltip logic
+
     const tooltip = ensureTooltip('stacked-tooltip');
 
     function ensureTooltip(id) {

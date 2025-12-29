@@ -20,7 +20,6 @@ export function renderDumbbellPlot(container, datasets) {
         .filter(d => d.year && d.rate)
         .sort((a, b) => a.year - b.year);
 
-    // Filter data from 1950 to 2025
     const filteredData = data.filter(d => d.year >= 1950 && d.year <= 2025);
 
     if (filteredData.length === 0) return;
@@ -62,7 +61,6 @@ export function renderDumbbellPlot(container, datasets) {
     svg.selectAll('*').remove();
     const g = svg.append('g').attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
-    // Scales
     const yScale = d3.scaleLinear()
         .domain([minRate * 0.85, maxRate * 1.05])
         .range([HEIGHT, 0]);
@@ -71,14 +69,12 @@ export function renderDumbbellPlot(container, datasets) {
         .domain([startData.year, endData.year])
         .range([0, WIDTH]);
 
-    // Define tick values first (before using them in grid)
     const tickValues = d3.ticks(minRate * 0.85, maxRate * 1.05, 5);
     if (!tickValues.includes(0) && 0 >= minRate * 0.85 && 0 <= maxRate * 1.05) {
         tickValues.push(0);
         tickValues.sort((a, b) => a - b);
     }
 
-    // Background grid
     g.append('g')
         .attr('class', 'grid')
         .style('stroke', '#444')
@@ -89,7 +85,6 @@ export function renderDumbbellPlot(container, datasets) {
             .tickValues(tickValues)
         );
 
-    // Zero line indicator - stylish if zero is visible
     const zeroY = yScale(0);
     if (zeroY >= 0 && zeroY <= HEIGHT) {
         g.append('line')
@@ -105,21 +100,18 @@ export function renderDumbbellPlot(container, datasets) {
             .text('0%');
     }
 
-    // Left axis (year 1950) - ensure 0 is included in ticks
     g.append('g')
         .attr('class', 'axis')
         .style('fill', textColor)
         .style('font-size', '12px')
         .call(d3.axisLeft(yScale).tickValues(tickValues).tickFormat(d => d.toFixed(0)));
 
-    // Right axis (year 2025)
     g.append('g')
         .attr('transform', `translate(${WIDTH},0)`)
         .style('fill', textColor)
         .style('font-size', '12px')
         .call(d3.axisRight(yScale).tickValues(tickValues).tickFormat(d => d.toFixed(0)));
 
-    // Year labels
     g.append('text')
         .attr('x', -30).attr('y', -10)
         .style('font-size', '14px').style('font-weight', 'bold').style('fill', textColor)
@@ -132,12 +124,9 @@ export function renderDumbbellPlot(container, datasets) {
         .style('text-anchor', 'middle')
         .text(endData.year);
 
-    // Draw connecting lines (slope chart) - color based on mortality rate
     for (let i = 0; i < filteredData.length - 1; i++) {
         const current = filteredData[i];
         const next = filteredData[i + 1];
-
-        // Color based on mortality rate (average of current and next)
         const avgRate = (current.rate + next.rate) / 2;
         const progress = (avgRate - minRate) / (maxRate - minRate);
         const color = d3.interpolate(COLORS.start, COLORS.worsened)(progress);
@@ -154,7 +143,6 @@ export function renderDumbbellPlot(container, datasets) {
             .style('pointer-events', 'none');
     }
 
-    // Add vertical line for interaction
     const verticalLine = g.append('line')
         .attr('class', 'vertical-line')
         .attr('y1', 0).attr('y2', HEIGHT)
@@ -162,7 +150,6 @@ export function renderDumbbellPlot(container, datasets) {
         .attr('opacity', 0)
         .style('pointer-events', 'none');
 
-    // Add interactive overlay
     g.append('rect')
         .attr('width', WIDTH).attr('height', HEIGHT)
         .attr('fill', 'transparent')
@@ -187,14 +174,10 @@ export function renderDumbbellPlot(container, datasets) {
             hideTooltip();
         });
 
-    // Add color scale legend at the bottom
-
-    // Add color scale legend at the bottom
     const legendX = WIDTH / 2 - 100;
     const legendY = HEIGHT + 30;
     const legendWidth = 150;
 
-    // Create color scale gradient (inverted)
     const defs = svg.append('defs');
     const gradient = defs.append('linearGradient')
         .attr('id', 'color-scale-gradient')
@@ -204,21 +187,18 @@ export function renderDumbbellPlot(container, datasets) {
     gradient.append('stop').attr('offset', '0%').attr('stop-color', COLORS.worsened);
     gradient.append('stop').attr('offset', '100%').attr('stop-color', COLORS.start);
 
-    // Max value label (left)
     g.append('text')
         .attr('x', legendX - 10).attr('y', legendY + 20)
         .style('font-size', '11px').style('fill', textColor)
         .style('text-anchor', 'end')
         .text(`${maxRate.toFixed(1)}%`);
 
-    // Legend background rectangle (gradient)
     g.append('rect')
         .attr('x', legendX).attr('y', legendY)
         .attr('width', legendWidth).attr('height', 15)
         .attr('fill', 'url(#color-scale-gradient)')
         .attr('stroke', textMuted).attr('stroke-width', 1);
 
-    // Min value label (right)
     g.append('text')
         .attr('x', legendX + legendWidth + 10).attr('y', legendY + 20)
         .style('font-size', '11px').style('fill', textColor)

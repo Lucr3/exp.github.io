@@ -1,7 +1,3 @@
-// Grouped Bar Chart for Education Enrollment Ratios
-// Dataset: primary-secondary-enrollment-completion-rates.csv
-// Compares Primary, Secondary, and Tertiary enrollment for each year
-
 export function renderGroupedBarChart(container, datasets) {
     const root = d3.select(container);
     const svg = root.select('#grouped-bar-svg');
@@ -9,35 +5,30 @@ export function renderGroupedBarChart(container, datasets) {
 
     if (root.empty() || svg.empty() || !datasets.Education) return;
 
-    // --- 1. Theme & Logic Setup ---
     const style = getComputedStyle(document.documentElement);
     const textColor = style.getPropertyValue('--text-color').trim() || '#eaeaea';
     const textMuted = style.getPropertyValue('--text-muted').trim() || '#D9D9D6';
     const gridColor = style.getPropertyValue('--border-color').trim() || '#444';
 
-    // Colors for each education level
     const COLORS = {
-        Primary: '#0173B2',    // Blue
-        Secondary: '#DE8F05',  // Orange
-        Tertiary: '#7570B3'    // Purple
+        Primary: '#0173B2',
+        Secondary: '#DE8F05',
+        Tertiary: '#7570B3'
     };
 
-    // Standardized margins
     const MARGIN = { top: 40, right: 30, bottom: 60, left: 60 };
     const WIDTH = 960 - MARGIN.left - MARGIN.right;
     const HEIGHT = 450 - MARGIN.top - MARGIN.bottom;
 
-    // Set viewBox
     svg.attr('viewBox', `0 0 960 450`)
         .attr('preserveAspectRatio', 'xMidYMid meet')
         .style('width', '100%')
         .style('height', 'auto');
 
-    // --- 2. Data Processing ---
     const rawData = datasets.Education
-        .filter(d => d['Gross enrolment ratio in primary education'] || 
-                     d['Gross enrolment ratio in secondary education'] ||
-                     d['Gross enrolment ratio in tertiary education'])
+        .filter(d => d['Gross enrolment ratio in primary education'] ||
+            d['Gross enrolment ratio in secondary education'] ||
+            d['Gross enrolment ratio in tertiary education'])
         .map(d => ({
             year: +d['Year'],
             Primary: parseFloat(d['Gross enrolment ratio in primary education']) || null,
@@ -51,7 +42,6 @@ export function renderGroupedBarChart(container, datasets) {
     const subgroups = ['Primary', 'Secondary', 'Tertiary'];
     const years = rawData.map(d => d.year);
 
-    // --- 3. Scales ---
     const x = d3.scaleBand()
         .domain(years)
         .range([0, WIDTH])
@@ -62,7 +52,6 @@ export function renderGroupedBarChart(container, datasets) {
         .range([0, x.bandwidth()])
         .padding(0.05);
 
-    // Get max value
     const allValues = [];
     rawData.forEach(d => {
         if (d.Primary) allValues.push(d.Primary);
@@ -79,14 +68,12 @@ export function renderGroupedBarChart(container, datasets) {
         .domain(subgroups)
         .range([COLORS.Primary, COLORS.Secondary, COLORS.Tertiary]);
 
-    // --- 4. Draw ---
     svg.selectAll('*').remove();
     if (legendContainer) legendContainer.html('');
 
     const g = svg.append('g')
         .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
-    // Grid
     g.append('g')
         .attr('class', 'grid')
         .call(d3.axisLeft(y)
@@ -99,14 +86,12 @@ export function renderGroupedBarChart(container, datasets) {
         .style('stroke-dasharray', '3,3')
         .select('.domain').remove();
 
-    // Create groups for each year
     const groups = g.selectAll('g.year-group')
         .data(rawData)
         .join('g')
         .attr('class', 'year-group')
         .attr('transform', d => `translate(${x(d.year)},0)`);
 
-    // Add bars for each subgroup
     subgroups.forEach(subgroup => {
         groups.selectAll(`rect.${subgroup}`)
             .data(d => [d])
@@ -120,7 +105,7 @@ export function renderGroupedBarChart(container, datasets) {
             .attr('ry', 2)
             .attr('fill', color(subgroup))
             .style('opacity', 0.9)
-            .on('mouseover', function(event, d) {
+            .on('mouseover', function (event, d) {
                 d3.select(this).style('opacity', 1);
                 showTooltip(event, `
                     <div style="font-family: var(--font-body); line-height: 1.6;">
@@ -144,13 +129,12 @@ export function renderGroupedBarChart(container, datasets) {
                 `);
             })
             .on('mousemove', moveTooltip)
-            .on('mouseleave', function() {
+            .on('mouseleave', function () {
                 d3.select(this).style('opacity', 0.9);
                 hideTooltip();
             });
     });
 
-    // Title
     g.append('text')
         .attr('x', WIDTH / 2)
         .attr('y', -15)
@@ -160,7 +144,6 @@ export function renderGroupedBarChart(container, datasets) {
         .style('font-weight', 'bold')
         .text('Education Enrollment Ratios by Level');
 
-    // Axes
     g.append('g')
         .attr('transform', `translate(0,${HEIGHT})`)
         .call(d3.axisBottom(x).tickSize(0).tickPadding(15))
@@ -178,7 +161,6 @@ export function renderGroupedBarChart(container, datasets) {
         .style('fill', textMuted)
         .style('font-size', '11px');
 
-    // Legend (HTML based)
     if (legendContainer && !legendContainer.empty()) {
         subgroups.forEach(key => {
             const item = legendContainer.append('div')
@@ -199,7 +181,6 @@ export function renderGroupedBarChart(container, datasets) {
         });
     }
 
-    // Tooltip logic
     const tooltip = ensureTooltip('grouped-bar-tooltip');
 
     function ensureTooltip(id) {

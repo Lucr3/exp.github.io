@@ -106,7 +106,7 @@ export function renderStackedArea(container, datasets) {
         const birthsLine = makeLineGen('births');
         const deathsLine = makeLineGen('deaths');
 
-        // Historical data
+
         if (historical.length) {
             drawPath(chartArea, historical, birthsArea, COLORS.births, { opacity: 0.6 });
             drawPath(chartArea, historical, deathsArea, COLORS.deaths, { opacity: 0.6 });
@@ -114,7 +114,7 @@ export function renderStackedArea(container, datasets) {
             drawPath(chartArea, historical, deathsLine, COLORS.deaths, { isLine: true });
         }
 
-        // Projected data - bridge from last historical point
+
         if (projected.length) {
             const bridgeData = historical.length ? [historical.at(-1), ...projected] : projected;
             drawPath(chartArea, bridgeData, birthsArea, COLORS.births, { opacity: 0.3 });
@@ -123,7 +123,7 @@ export function renderStackedArea(container, datasets) {
             drawPath(chartArea, bridgeData, deathsLine, COLORS.deaths, { isLine: true, dashed: true, opacity: 0.7 });
         }
 
-        // Current year marker
+
         if (CURRENT_YEAR >= domain[0] && CURRENT_YEAR <= domain[1]) {
             g.append('line')
                 .attr('x1', xScale(CURRENT_YEAR)).attr('x2', xScale(CURRENT_YEAR))
@@ -137,7 +137,7 @@ export function renderStackedArea(container, datasets) {
                 .text('2024');
         }
 
-        // Year labels
+
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         const labelColor = isDark ? '#ffffff' : '#1a1a1a';
         const yearRange = domain[1] - domain[0];
@@ -151,7 +151,7 @@ export function renderStackedArea(container, datasets) {
                 .text(year);
         }
 
-        // Brush for zoom
+
         const brush = d3.brushX()
             .extent([[0, 0], [WIDTH, HEIGHT]])
             .on('end', event => {
@@ -172,7 +172,7 @@ export function renderStackedArea(container, datasets) {
             .attr('fill', COLORS.births).attr('fill-opacity', 0.3)
             .attr('stroke', COLORS.births).attr('stroke-width', 1);
 
-        // Hover elements
+
         const hoverLine = g.append('line')
             .attr('stroke', textColor).attr('stroke-width', 1).attr('stroke-dasharray', '3,2')
             .attr('y1', 0).attr('y2', HEIGHT)
@@ -219,7 +219,7 @@ export function renderStackedArea(container, datasets) {
                 renderChart(currentDomain);
             });
 
-        // Reset button when zoomed
+
         const isZoomed = domain[0] !== fullDomain[0] || domain[1] !== fullDomain[1];
         if (isZoomed) {
             g.append('rect')

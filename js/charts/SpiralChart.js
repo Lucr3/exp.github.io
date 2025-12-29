@@ -21,23 +21,21 @@ export function renderSpiralChart(container, datasets) {
     const INNER_RADIUS = 50;
     const OUTER_RADIUS = 350;
 
-    // Color scale - yellow to orange/red (high interest)
+
     const colorScale = d3.scaleSequential(d3.interpolateYlOrRd)
         .domain([0, 100]);
 
     const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    // --- 2. Data Processing ---
-    // Parse the GoogleTrends data (new column name: "Yemen: (World)")
-    // Handle both Date objects (from d3.autoType) and strings
+
     const rawData = datasets.GoogleTrends
         .filter(d => d.Month && d['Yemen: (World)'] !== undefined)
         .map(d => {
             let year, month;
             if (d.Month instanceof Date) {
                 year = d.Month.getFullYear();
-                month = d.Month.getMonth() + 1; // getMonth() is 0-indexed
+                month = d.Month.getMonth() + 1;
             } else {
                 [year, month] = String(d.Month).split('-').map(Number);
             }
@@ -59,17 +57,15 @@ export function renderSpiralChart(container, datasets) {
     const years = [...new Set(rawData.map(d => d.year))].sort();
     const numYears = years.length;
 
-    // Radius scale - maps year index to radius
     const radiusScale = d3.scaleLinear()
         .domain([0, numYears - 1])
         .range([INNER_RADIUS, OUTER_RADIUS]);
 
-    // Angle scale - maps month (1-12) to angle (0 to 2π)
     const angleScale = d3.scaleLinear()
-        .domain([1, 13]) // 1 to 12, with 13 wrapping
+        .domain([1, 13])
         .range([0, 2 * Math.PI]);
 
-    // --- 3. Draw ---
+
     svg.selectAll('*').remove();
     legendContainer.html('');
 
@@ -79,7 +75,6 @@ export function renderSpiralChart(container, datasets) {
     const g = svg.append('g')
         .attr('transform', `translate(${CENTER.x}, ${CENTER.y})`);
 
-    // Background circles for each year
     years.forEach((year, i) => {
         const radius = radiusScale(i);
         g.append('circle')
@@ -92,9 +87,8 @@ export function renderSpiralChart(container, datasets) {
             .attr('stroke-dasharray', '2,4');
     });
 
-    // Month spokes
     for (let m = 1; m <= 12; m++) {
-        const angle = angleScale(m) - Math.PI / 2; // Start from top
+        const angle = angleScale(m) - Math.PI / 2;
         const x1 = INNER_RADIUS * Math.cos(angle);
         const y1 = INNER_RADIUS * Math.sin(angle);
         const x2 = OUTER_RADIUS * Math.cos(angle);
@@ -106,7 +100,6 @@ export function renderSpiralChart(container, datasets) {
             .attr('stroke', textMuted)
             .attr('stroke-opacity', 0.1);
 
-        // Month labels
         const labelRadius = OUTER_RADIUS + 20;
         const lx = labelRadius * Math.cos(angle);
         const ly = labelRadius * Math.sin(angle);
@@ -121,7 +114,6 @@ export function renderSpiralChart(container, datasets) {
             .text(MONTHS[m - 1]);
     }
 
-    // Tooltip
     function ensureTooltip(id) {
         let el = d3.select(`#${id}`);
         if (el.empty()) el = d3.select('body').append('div').attr('id', id);
@@ -161,7 +153,6 @@ export function renderSpiralChart(container, datasets) {
         tooltip.style('opacity', 0).style('display', 'none');
     }
 
-    // Draw data points as arcs on the spiral
     const arcGenerator = d3.arc();
 
     rawData.forEach(d => {
@@ -172,7 +163,6 @@ export function renderSpiralChart(container, datasets) {
         const startAngle = angleScale(d.month) - Math.PI / 2;
         const endAngle = angleScale(d.month + 1) - Math.PI / 2;
 
-        // Arc thickness based on year (slightly thicker for outer rings)
         const thickness = 8 + yearIndex * 0.5;
 
         g.append('path')
@@ -198,11 +188,10 @@ export function renderSpiralChart(container, datasets) {
             });
     });
 
-    // Year labels along the spiral (at January position)
     years.filter((_, i) => i % 3 === 0 || i === numYears - 1).forEach((year, idx) => {
         const yearIndex = years.indexOf(year);
         const radius = radiusScale(yearIndex);
-        const angle = angleScale(1) - Math.PI / 2; // January
+        const angle = angleScale(1) - Math.PI / 2;
 
         g.append('text')
             .attr('x', (radius + 15) * Math.cos(angle))
@@ -215,7 +204,6 @@ export function renderSpiralChart(container, datasets) {
             .text(year);
     });
 
-    // Center label
     g.append('text')
         .attr('x', 0)
         .attr('y', 0)
@@ -235,11 +223,9 @@ export function renderSpiralChart(container, datasets) {
         .style('font-size', '10px')
         .text('Google Trends');
 
-    // Legend (color scale)
     const legendWidth = 150;
     const legendHeight = 12;
 
-    // Create gradient for legend
     const defs = svg.append('defs');
     const gradient = defs.append('linearGradient')
         .attr('id', 'spiral-legend-gradient')
@@ -250,7 +236,6 @@ export function renderSpiralChart(container, datasets) {
     gradient.append('stop').attr('offset', '50%').attr('stop-color', colorScale(50));
     gradient.append('stop').attr('offset', '100%').attr('stop-color', colorScale(100));
 
-    // Legend items
     legendContainer.style('display', 'flex')
         .style('align-items', 'center')
         .style('gap', '10px')

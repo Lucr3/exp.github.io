@@ -1,7 +1,3 @@
-// Histogram for Google Trends Interest Distribution
-// Dataset: GoogleTrends.csv
-// Shows distribution of interest scores (0-100)
-
 export function renderHistogram(container, datasets) {
     const root = d3.select(container);
     const svg = root.select('#histogram-svg');
@@ -12,27 +8,22 @@ export function renderHistogram(container, datasets) {
         return;
     }
 
-    // Verifica che abbiamo dati
     if (!Array.isArray(datasets.GoogleTrends) || datasets.GoogleTrends.length === 0) {
         console.warn('Histogram: No GoogleTrends data available');
         return;
     }
 
-    // --- 1. Theme & Logic Setup ---
     const style = getComputedStyle(document.documentElement);
     const textColor = style.getPropertyValue('--text-color').trim() || '#eaeaea';
     const textMuted = style.getPropertyValue('--text-muted').trim() || '#D9D9D6';
     const gridColor = style.getPropertyValue('--border-color').trim() || '#444';
 
-    // Color for histogram bars
     const barColor = '#0173B2';
 
-    // Standardized margins
     const MARGIN = { top: 40, right: 30, bottom: 60, left: 60 };
     const WIDTH = 960 - MARGIN.left - MARGIN.right;
     const HEIGHT = 450 - MARGIN.top - MARGIN.bottom;
 
-    // Set viewBox
     svg.attr('viewBox', `0 0 960 450`)
         .attr('preserveAspectRatio', 'xMidYMid meet')
         .style('width', '100%')
@@ -40,7 +31,6 @@ export function renderHistogram(container, datasets) {
         .style('min-height', '450px')
         .style('background', 'transparent');
 
-    // --- 2. Data Processing ---
     const rawData = datasets.GoogleTrends
         .filter(d => d && d['Yemen: (World)'] !== undefined && d['Yemen: (World)'] !== null)
         .map(d => {
@@ -56,7 +46,6 @@ export function renderHistogram(container, datasets) {
         return;
     }
 
-    // Create histogram bins (0-10, 10-20, ..., 90-100)
     const binSize = 10;
     const bins = d3.bin()
         .domain([0, 100])
@@ -76,7 +65,6 @@ export function renderHistogram(container, datasets) {
         return;
     }
 
-    // --- 3. Scales ---
     const x = d3.scaleBand()
         .domain(histogramData.map(d => d.label))
         .range([0, WIDTH])
@@ -86,14 +74,12 @@ export function renderHistogram(container, datasets) {
         .domain([0, d3.max(histogramData, d => d.length) * 1.15])
         .range([HEIGHT, 0]);
 
-    // --- 4. Draw ---
     svg.selectAll('*').remove();
     if (legendContainer) legendContainer.html('');
 
     const g = svg.append('g')
         .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
-    // Grid
     g.append('g')
         .attr('class', 'grid')
         .call(d3.axisLeft(y)
@@ -106,7 +92,6 @@ export function renderHistogram(container, datasets) {
         .style('stroke-dasharray', '3,3')
         .select('.domain').remove();
 
-    // Bars
     g.selectAll('rect.bar')
         .data(histogramData)
         .join('rect')
@@ -119,7 +104,7 @@ export function renderHistogram(container, datasets) {
         .attr('ry', 2)
         .attr('fill', barColor)
         .style('opacity', 0.9)
-        .on('mouseover', function(event, d) {
+        .on('mouseover', function (event, d) {
             d3.select(this).style('opacity', 1);
             showTooltip(event, `
                 <div style="font-family: var(--font-body); line-height: 1.6;">
@@ -132,12 +117,11 @@ export function renderHistogram(container, datasets) {
             `);
         })
         .on('mousemove', moveTooltip)
-        .on('mouseleave', function() {
+        .on('mouseleave', function () {
             d3.select(this).style('opacity', 0.9);
             hideTooltip();
         });
 
-    // Title
     g.append('text')
         .attr('x', WIDTH / 2)
         .attr('y', -15)
@@ -147,7 +131,6 @@ export function renderHistogram(container, datasets) {
         .style('font-weight', 'bold')
         .text('Google Trends Interest Distribution (0-100)');
 
-    // Axes
     g.append('g')
         .attr('transform', `translate(0,${HEIGHT})`)
         .call(d3.axisBottom(x).tickSize(0).tickPadding(15))
@@ -165,7 +148,6 @@ export function renderHistogram(container, datasets) {
         .style('fill', textMuted)
         .style('font-size', '11px');
 
-    // Axis labels
     g.append('text')
         .attr('x', WIDTH / 2)
         .attr('y', HEIGHT + MARGIN.bottom - 10)
@@ -183,7 +165,6 @@ export function renderHistogram(container, datasets) {
         .style('font-size', '12px')
         .text('Frequency');
 
-    // Tooltip logic
     const tooltip = ensureTooltip('histogram-tooltip');
 
     function ensureTooltip(id) {
