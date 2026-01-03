@@ -1,14 +1,16 @@
-  <div id="Alluvional-render">
+<div id="Alluvional-render">
   <div id="alluvial-chart" class="card-shell-narrow">
     <div class="h4 pt-2 fw-bold text-center">
       Water, Viruses, and Storms: The Parallel Crisis
     </div>
-    <div class="h6 pt-2 mb-4 fw-bold text-center" style="color: var(--text-muted);">Hierarchical breakdown of disaster events by type and specific impact</div>
+    <div class="h6 pt-2 mb-4 fw-bold text-center" style="color: var(--text-muted);">Hierarchical breakdown of disaster
+      events by type and specific impact</div>
 
-    <div class="mb-3 text-center">
+    <div class="mb-3 text-center alluvial-desktop-only">
       <div class="d-inline-block align-middle mx-2">
         <label for="alluvial-year-start" class="form-label fw-semibold mb-0 me-2">Start year:</label>
-        <select id="alluvial-year-start" class="form-select form-select-sm d-inline-block" style="width: auto;"></select>
+        <select id="alluvial-year-start" class="form-select form-select-sm d-inline-block"
+          style="width: auto;"></select>
       </div>
       <div class="d-inline-block align-middle mx-2">
         <label for="alluvial-year-end" class="form-label fw-semibold mb-0 me-2">End year:</label>
@@ -16,20 +18,27 @@
       </div>
     </div>
 
-    <div class="alluvial-wrapper">
+    <div class="alluvial-mobile-warning">
+      <div class="mobile-warning-content">
+        <i class="bi bi-display" style="font-size: 2rem;"></i>
+        <p>This chart is best viewed on a larger screen.</p>
+      </div>
+    </div>
+
+    <div class="alluvial-wrapper alluvial-desktop-only">
       <svg id="alluvial-svg" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
 
     <div class="card-narrow">
       <p class="mt-2 mb-0 pt-2 small text-start card-note">
-        As battlefronts shift, Yemen wages a silent war against nature and disease. 
+        As battlefronts shift, Yemen wages a silent war against nature and disease.
         This flood diagram breaks down the collateral crises that have devastated the
-         country over the past decade.
+        country over the past decade.
         <br> The most significant data streams reveal two dramatic truths: the extreme
-         fragility of the territory in the face of flash floods and the collapse of the
-          healthcare system, which has paved the way for massive outbreaks of cholera
-           and viral diseases. The visualization traces the hierarchical path from a general
-            disaster category to the specific triggering event.
+        fragility of the territory in the face of flash floods and the collapse of the
+        healthcare system, which has paved the way for massive outbreaks of cholera
+        and viral diseases. The visualization traces the hierarchical path from a general
+        disaster category to the specific triggering event.
       </p>
     </div>
   </div>

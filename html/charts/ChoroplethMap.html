@@ -6,7 +6,7 @@
         How the conflict fragmented the national market, creating unsustainable food-cost zones
     </div>
 
-    <div class="mb-3 text-center">
+    <div class="mb-3 text-center choropleth-desktop-only">
         <div class="d-inline-block align-middle mx-2">
             <label for="choropleth-commodity" class="form-label fw-semibold mb-0 me-2">Commodity:</label>
             <select id="choropleth-commodity" class="form-select form-select-sm d-inline-block"
@@ -14,7 +14,7 @@
         </div>
     </div>
 
-    <div class="mb-3 text-center">
+    <div class="mb-3 text-center choropleth-desktop-only">
         <div class="d-inline-block align-middle mx-2">
             <button id="choropleth-play-btn" class="btn btn-primary btn-sm me-3">
                 <i class="bi bi-play-fill"></i> Play
@@ -26,7 +26,7 @@
         </div>
     </div>
 
-    <div class="mb-3 text-center">
+    <div class="mb-3 text-center choropleth-desktop-only">
         <div class="d-inline-block align-middle mx-2">
             <label for="choropleth-year-slider" class="form-label fw-semibold mb-0">Year:</label>
             <input type="range" id="choropleth-year-slider" class="form-range d-inline-block"
@@ -35,7 +35,15 @@
         </div>
     </div>
 
-    <div class="choropleth-wrapper" style="position: relative; width: 100%; max-width: 100%; overflow: hidden;">
+    <div class="choropleth-mobile-warning">
+        <div class="mobile-warning-content">
+            <i class="bi bi-display" style="font-size: 2rem;"></i>
+            <p>This chart is best viewed on a larger screen.</p>
+        </div>
+    </div>
+
+    <div class="choropleth-wrapper choropleth-desktop-only"
+        style="position: relative; width: 100%; max-width: 100%; overflow: hidden;">
         <svg id="choropleth-svg" viewBox="0 0 960 500" preserveAspectRatio="xMidYMid meet"
             style="display: block; width: 100%;"></svg>
         <div id="choropleth-zoom-controls"
@@ -53,14 +61,14 @@
 
     <div class="card-narrow">
         <p class="mt-2 mb-0 pt-2 small text-start card-note">
-        More than just monitoring price lists, this map visualizes the deep economic 
-        divide that runs through the country. The data traces the invisible boundaries 
-        of a fragmented market, where geography determines access to survival.
-        <br>The areas highlighted in dark red identify the governorates where inflation
-         has transformed basic necessities—such as flour and legumes—into luxury goods. 
-         The color gradient tells the story of two divergent economic systems: areas where
-          the market is holding up and vast areas where currency devaluation and supply
-           chain disruption have systematically eroded the population's purchasing power.
+            More than just monitoring price lists, this map visualizes the deep economic
+            divide that runs through the country. The data traces the invisible boundaries
+            of a fragmented market, where geography determines access to survival.
+            <br>The areas highlighted in dark red identify the governorates where inflation
+            has transformed basic necessities—such as flour and legumes—into luxury goods.
+            The color gradient tells the story of two divergent economic systems: areas where
+            the market is holding up and vast areas where currency devaluation and supply
+            chain disruption have systematically eroded the population's purchasing power.
         </p>
     </div>
 </div>

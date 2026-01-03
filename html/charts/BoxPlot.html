@@ -6,7 +6,7 @@
         Analyzing price variance and market instability across essential commodities
     </div>
 
-    <div class="text-center mb-3">
+    <div class="text-center mb-3 boxplot-desktop-only">
         <label for="commodity-filter" class="form-label fw-bold" style="color: var(--text-color);">Filter by
             category:</label>
         <select id="commodity-filter" class="form-select form-select-sm"
@@ -18,7 +18,16 @@
         </select>
     </div>
 
-    <div class="boxplot-wrapper" style="position: relative; width: 100%; max-width: 100%; overflow: auto;">
+    <div class="boxplot-mobile-warning">
+        <div class="mobile-warning-content">
+            <i class="bi bi-display" style="font-size: 2rem;"></i>
+            <p>This chart is best viewed on a larger screen.</p>
+
+        </div>
+    </div>
+
+    <div class="boxplot-wrapper boxplot-desktop-only"
+        style="position: relative; width: 100%; max-width: 100%; overflow: auto;">
         <svg id="boxplot-svg" viewBox="0 0 960 600" preserveAspectRatio="xMidYMid meet"
             style="display: block; width: 100%; height: auto; min-height: 600px;"></svg>
     </div>
@@ -26,15 +35,15 @@
     <div class="card-narrow">
         <p class="mt-2 mb-0 pt-2 small text-start card-note">
             This visualization shifts the focus from ‘how much it costs’ to
-             ‘how unpredictable it is’. Box plots reveal the schizophrenia of 
-             the Yemeni market: while some goods maintain a relatively narrow
-              price range, key sectors such as fuel show violent fluctuations.
+            ‘how unpredictable it is’. Box plots reveal the schizophrenia of
+            the Yemeni market: while some goods maintain a relatively narrow
+            price range, key sectors such as fuel show violent fluctuations.
             <br>The anomalous peaks highlighted in red tell a story of extreme
-             disparity: the same liter of gasoline or kilo of flour can cost
-              radically different amounts depending on the region and availability
-               at the time. It is the statistical representation of an economy where
-                stability has become the scarcest commodity, making it impossible for
-                 families to plan for their survival.
+            disparity: the same liter of gasoline or kilo of flour can cost
+            radically different amounts depending on the region and availability
+            at the time. It is the statistical representation of an economy where
+            stability has become the scarcest commodity, making it impossible for
+            families to plan for their survival.
         </p>
     </div>
 </div>

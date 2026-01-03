@@ -41,12 +41,13 @@ export function renderSymbolMap(container, datasets) {
 
     svg.selectAll('g.chart-root, rect.background').remove();
 
-    // Make SVG responsive
-    svg.attr('viewBox', '0 0 960 500')
+
+    svg.attr('viewBox', `0 0 960 450`)
         .attr('preserveAspectRatio', 'xMidYMid meet')
         .style('width', '100%')
-        .style('height', 'auto');
-
+        .style('height', 'auto')
+        .style('min-height', '450px')
+        .style('background', 'transparent');
     svg.append('rect').attr('class', 'background').attr('width', 960).attr('height', 500).attr('fill', '#2d3436');
 
     const g = svg.append('g').attr('class', 'chart-root').attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);

@@ -75,7 +75,6 @@ export function renderStackedArea(container, datasets) {
     function renderChart(domain) {
         svg.selectAll('*').remove();
 
-        // Make SVG responsive
         svg.attr('viewBox', '0 0 960 450')
             .attr('preserveAspectRatio', 'xMidYMid meet')
             .style('width', '100%')

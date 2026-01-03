@@ -280,14 +280,12 @@ header {
     display: none;
 }
 
-/* Nav Controls - container for theme toggle and hamburger */
 .nav-controls {
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
 }
 
-/* Hamburger Menu - hidden by default on desktop */
 .hamburger {
     display: none;
     flex-direction: column;
@@ -538,6 +536,14 @@ header {
     margin-bottom: var(--spacing-sm);
 }
 
+.boxplot-mobile-warning,
+.spiral-mobile-warning,
+.symbolmap-mobile-warning,
+.choropleth-mobile-warning,
+.alluvial-mobile-warning {
+    display: none;
+}
+
 #about {
     background-color: var(--secondary-color);
     min-height: auto;
@@ -628,41 +634,34 @@ footer p {
         font-size: 1.1rem;
     }
 
-    /* Chart SVG responsiveness at tablet size */
     .chart-wrapper svg {
         width: 100%;
         height: auto;
     }
 
-    /* Alluvial wrapper tablet */
     .alluvial-wrapper {
         width: 100%;
         max-width: 100%;
     }
 
-    /* Team cards single column on tablet */
     .team-grid {
         grid-template-columns: 1fr;
     }
 
-    /* Container padding */
     .container {
         padding: 0 var(--spacing-md);
     }
 
-    /* Show Hamburger Menu on mobile */
     .hamburger {
         display: flex;
     }
 
-    /* Nav Controls Container */
     .nav-controls {
         display: flex;
         align-items: center;
         gap: var(--spacing-md);
     }
 
-    /* Mobile Nav Links */
     .nav-links {
         position: absolute;
         top: 100%;
@@ -711,7 +710,6 @@ footer p {
     }
 }
 
-/* Hide hamburger on larger screens */
 @media (min-width: 769px) {
     .hamburger {
         display: none;
@@ -737,7 +735,6 @@ footer p {
         padding: var(--spacing-sm) var(--spacing-md);
     }
 
-    /* Chart container mobile adjustments */
     .chart-container {
         margin: 0 -0.5rem;
         border-radius: 0;
@@ -773,21 +770,18 @@ footer p {
         font-size: 0.9rem;
     }
 
-    /* Alluvial chart mobile */
     .alluvial-wrapper {
         width: 100%;
         max-width: 100%;
         overflow-x: auto;
     }
 
-    /* SVG chart responsiveness */
     .chart-wrapper svg {
         width: 100%;
         height: auto;
         min-height: 200px;
     }
 
-    /* Controls styling on mobile */
     .chart-controls,
     .map-controls {
         flex-wrap: wrap;
@@ -805,7 +799,6 @@ footer p {
         padding: 0.4rem 0.8rem;
     }
 
-    /* Legend adjustments */
     .legend,
     .chart-legend {
         flex-wrap: wrap;
@@ -813,7 +806,6 @@ footer p {
         font-size: 0.75rem;
     }
 
-    /* Spiral chart container */
     .spiral-wrapper {
         max-width: 100%;
         overflow: hidden;
@@ -824,7 +816,6 @@ footer p {
         font-size: 0.7rem;
     }
 
-    /* Section padding mobile */
     .section {
         padding: var(--spacing-lg) var(--spacing-sm);
     }
@@ -839,6 +830,88 @@ footer p {
 
     .chart-block {
         gap: var(--spacing-md);
+    }
+
+    html,
+    body {
+        overflow-x: hidden;
+        max-width: 100vw;
+    }
+
+    .boxplot-mobile-warning {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+        padding: var(--spacing-lg);
+        background: var(--card-background);
+        border: 2px dashed var(--border-color);
+        border-radius: var(--border-radius);
+        text-align: center;
+    }
+
+    .mobile-warning-content {
+        color: var(--text-muted);
+    }
+
+    .mobile-warning-content i {
+        color: var(--title-color);
+        margin-bottom: var(--spacing-md);
+        display: block;
+    }
+
+    .mobile-warning-content p {
+        font-size: 1rem;
+        margin-bottom: var(--spacing-sm);
+        color: var(--text-color);
+    }
+
+    .mobile-warning-content small {
+        font-size: 0.8rem;
+        font-style: italic;
+        color: var(--text-muted);
+    }
+
+    .boxplot-desktop-only,
+    .spiral-desktop-only,
+    .symbolmap-desktop-only,
+    .choropleth-desktop-only,
+    .alluvial-desktop-only {
+        display: none !important;
+    }
+
+    .boxplot-mobile-warning,
+    .spiral-mobile-warning,
+    .symbolmap-mobile-warning,
+    .choropleth-mobile-warning,
+    .alluvial-mobile-warning {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+        padding: var(--spacing-lg);
+        background: var(--card-background);
+        border: 2px dashed var(--border-color);
+        border-radius: var(--border-radius);
+        text-align: center;
+    }
+
+    .symbolic-map-wrapper {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .symbolic-map-wrapper svg {
+        width: 100%;
+        height: auto;
+        min-height: 300px;
+    }
+
+    #symbolic-zoom-controls {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        transform: scale(0.8);
     }
 }
 

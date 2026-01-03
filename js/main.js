@@ -63,7 +63,6 @@ async function init() {
         document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
     });
 
-    // Hamburger menu toggle
     const hamburger = document.getElementById('hamburger-menu');
     const navLinks = document.getElementById('nav-links');
 
@@ -73,7 +72,6 @@ async function init() {
         hamburger.setAttribute('aria-expanded', hamburger.classList.contains('active'));
     });
 
-    // Close menu when clicking a nav link
     navLinks?.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', () => {
             hamburger?.classList.remove('active');
