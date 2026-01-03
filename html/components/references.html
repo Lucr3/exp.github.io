@@ -1,10 +1,8 @@
 <section class="references-section">
     <div class="container">
         <h2 class="section-title">Datasets and References</h2>
-        <p class="section-subtitle">Discover the sources used to create the charts in this analysis</p>
         
         <div class="datasets-grid">
-            <!-- Births and Deaths Dataset -->
             <div class="dataset-card">
                 <div class="dataset-header">
                     <h3 class="dataset-title">Births and Deaths Projected to 2100</h3>
@@ -20,7 +18,6 @@
                 </a>
             </div>
 
-            <!-- Deaths in Armed Conflicts Dataset -->
             <div class="dataset-card">
                 <div class="dataset-header">
                     <h3 class="dataset-title">Deaths in Armed Conflicts</h3>
@@ -36,7 +33,6 @@
                 </a>
             </div>
 
-            <!-- Google Trends Dataset -->
             <div class="dataset-card">
                 <div class="dataset-header">
                     <h3 class="dataset-title">Google Trends - Yemen</h3>
@@ -45,14 +41,12 @@
                 <p class="dataset-description">Analysis of search trends related to Yemen in Italy, indicating global media interest.</p>
                 <div class="dataset-details">
                     <span class="detail-item"><i class="bi bi-search"></i> Source: Google</span>
-                    <span class="detail-item"><i class="bi bi-geo-alt"></i> Geo: Italy</span>
                 </div>
                 <a href="https://trends.google.it/trends/explore?geo=IT&q=yemen&hl=it" target="_blank" rel="noopener noreferrer" class="dataset-link">
                     Access Data <i class="bi bi-arrow-up-right"></i>
                 </a>
             </div>
 
-            <!-- Primary and Secondary Enrollment Dataset -->
             <div class="dataset-card">
                 <div class="dataset-header">
                     <h3 class="dataset-title">Primary and Secondary Enrollment Rates</h3>
@@ -68,7 +62,6 @@
                 </a>
             </div>
 
-            <!-- ACLED Aggregated Data -->
             <div class="dataset-card">
                 <div class="dataset-header">
                     <h3 class="dataset-title">ACLED Aggregated Data</h3>
@@ -84,7 +77,6 @@
                 </a>
             </div>
 
-            <!-- Youth Mortality Rate Dataset -->
             <div class="dataset-card">
                 <div class="dataset-header">
                     <h3 class="dataset-title">Youth Mortality Rate</h3>
@@ -100,7 +92,6 @@
                 </a>
             </div>
 
-            <!-- Food Prices Dataset -->
             <div class="dataset-card">
                 <div class="dataset-header">
                     <h3 class="dataset-title">Global Food Prices</h3>
@@ -116,7 +107,6 @@
                 </a>
             </div>
 
-            <!-- Natural Disasters Dataset -->
             <div class="dataset-card">
                 <div class="dataset-header">
                     <h3 class="dataset-title">Global Natural Disasters</h3>
@@ -136,6 +126,43 @@
         <div class="references-info">
             <h3>How This Data Was Used</h3>
             <p>Global datasets were cleaned and processed through Python to ensure accuracy and consistency in the interactive charts presented.</p>
+        </div>
+
+        <hr style="margin: 3rem 0; border: none; border-top: 1px solid var(--border-color);">
+
+        <h2 class="section-title">Methodology</h2>
+
+        <div style="margin-bottom: 3rem;">
+            <h3 style="color: #0052CC; margin-bottom: 1rem;">Data Cleaning</h3>
+            <div style="background: var(--card-background); padding: 1.5rem; border-radius: 8px; border-left: 4px solid #0052CC;">
+                <h4 style="margin-top: 0; color: var(--text-color);">What We Did</h4>
+                <p style="color: var(--text-muted); line-height: 1.6;">We kept the data as original as possible. Starting from large global datasets, we simply extracted only the rows concerning Yemen, discarding everything else. We did not modify the numbers or artificially fill in missing data: if you see "gaps" in the charts, it's because that data was genuinely missing from the source.</p>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 3rem;">
+            <h3 style="color: #0052CC; margin-bottom: 1rem;">Data Processing</h3>
+            <div style="background: var(--card-background); padding: 1.5rem; border-radius: 8px; border-left: 4px solid #0052CC;">
+                <h4 style="margin-top: 0; color: var(--text-color);">How We Went From Numbers to Charts</h4>
+                <p style="color: var(--text-muted); line-height: 1.6;">All the work happens directly in your browser. The code reads the files and uses the D3.js library to transform numbers into visual elements:</p>
+                <ul style="color: var(--text-muted); line-height: 1.8;">
+                    <li><strong>GPS coordinates</strong> become points and areas on the Yemen map.</li>
+                    <li><strong>Dates and numbers</strong> are converted into lines, spirals, or colored bars to make the timeline of the crisis immediately comprehensible.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 2rem;">
+            <h3 style="color: #0052CC; margin-bottom: 1rem;">Limitations</h3>
+            <div style="background: var(--card-background); padding: 1.5rem; border-radius: 8px; border-left: 4px solid #0052CC;">
+                <h4 style="margin-top: 0; color: var(--text-color);">What You Should Know Before Reading the Data</h4>
+                <p style="color: var(--text-muted); line-height: 1.6;">Collecting data in a war zone is very difficult, so keep in mind that:</p>
+                <ul style="color: var(--text-muted); line-height: 1.8;">
+                    <li><strong>Missing data:</strong> For some years (especially for education) there is no data because institutions were not functioning.</li>
+                    <li><strong>Isolated zones:</strong> Conflict reports may not capture everything that happens in the most remote and hard-to-reach areas.</li>
+                    <li><strong>Perspective:</strong> Google Trends data shows us only what people search for on the internet, not the actual severity of what happens on the ground.</li>
+                </ul>
+            </div>
         </div>
     </div>
 </section>

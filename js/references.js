@@ -76,7 +76,3 @@ async function init() {
 }
 
 init();
-
-init();
-
-init();

@@ -1374,7 +1374,7 @@ footer {
 
 .references-section {
     padding: calc(var(--spacing-xl) + 100px) var(--spacing-xl) var(--spacing-xl);
-    background: #0C1117;
+    background: var(--background-color);
     min-height: 100vh;
 }
 
