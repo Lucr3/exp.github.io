@@ -92,6 +92,17 @@ async function init() {
     renderGraph('StackedBarChart-container', renderStackedBarChart, datasets);
     renderGraph('SpiralChart-container', renderSpiralChart, datasets);
     renderGraph('Histogram-container', renderHistogram, datasets);
+
+    // Handle anchor navigation after content is loaded
+    if (window.location.hash) {
+        const targetId = window.location.hash.substring(1);
+        setTimeout(() => {
+            const element = document.getElementById(targetId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 100);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', init);

@@ -1244,3 +1244,194 @@ footer {
 [data-theme="light"] .form-range::-moz-range-track {
     background: #b0b0b0 !important;
 }
+
+/* ========================
+   REFERENCES SECTION STYLES
+   ======================== */
+
+.references-section {
+    padding: calc(var(--spacing-xl) + 100px) var(--spacing-xl) var(--spacing-xl);
+    background: #0C1117;
+    min-height: 100vh;
+}
+
+.section-title {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--title-color);
+    margin-bottom: var(--spacing-md);
+    text-align: center;
+    letter-spacing: -1px;
+}
+
+.section-subtitle {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    font-weight: 400;
+}
+
+.datasets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.dataset-card {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-lg);
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-shadow: 0 4px 6px var(--shadow-color);
+}
+
+.dataset-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 20px var(--shadow-color);
+    border-color: var(--title-color);
+}
+
+.dataset-header {
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+}
+
+.dataset-title {
+    font-family: var(--font-heading);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--title-color);
+    margin: 0;
+    flex: 1;
+}
+
+.dataset-badge {
+    display: inline-block;
+    background: var(--accent-color);
+    color: #ffffff;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dataset-description {
+    color: var(--text-color);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: var(--spacing-md);
+    flex-grow: 1;
+}
+
+.dataset-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.detail-item i {
+    color: #199BFC;
+    font-size: 1rem;
+}
+
+.dataset-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--accent-color);
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: var(--transition);
+    border: 2px solid var(--accent-color);
+    width: fit-content;
+}
+
+.dataset-link:hover {
+    background: transparent;
+    color: var(--accent-color);
+    transform: translateX(4px);
+}
+
+.dataset-link i {
+    font-size: 0.85rem;
+}
+
+.references-info {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-lg);
+    margin-top: var(--spacing-xl);
+}
+
+.references-info h3 {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--title-color);
+    margin-bottom: var(--spacing-md);
+}
+
+.references-info p {
+    color: var(--text-color);
+    font-size: 1rem;
+    line-height: 1.8;
+    margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 2rem;
+    }
+
+    .section-subtitle {
+        font-size: 1rem;
+    }
+
+    .datasets-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+
+    .dataset-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .dataset-card {
+        padding: var(--spacing-md);
+    }
+
+    .detail-item {
+        font-size: 0.85rem;
+    }
+}
