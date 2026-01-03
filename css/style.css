@@ -162,12 +162,13 @@ header {
 
 .navbar {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding: var(--spacing-md) var(--spacing-lg);
     max-width: 100%;
     width: 100%;
     margin: 0 auto;
+    flex-wrap: nowrap;
+    /* Prevent wrapping */
 }
 
 .logo h1 {
@@ -241,49 +242,98 @@ header {
 
 .theme-toggle {
     background: transparent;
-    border: 2px solid var(--border-color);
-    border-radius: 50px;
+    border: 1px solid transparent;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     cursor: pointer;
-    padding: 0.5rem 0.75rem;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0;
     transition: var(--transition);
     position: relative;
-    overflow: hidden;
     flex-shrink: 0;
 }
 
+[data-theme="dark"] .theme-toggle {
+    background: transparent;
+}
+
 .theme-toggle:hover {
-    border-color: var(--accent-color);
-    transform: scale(1.05);
+    background-color: var(--card-background);
+    border-color: var(--border-color);
+    transform: scale(1.1);
+}
+
+.theme-toggle::after {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: auto;
+    height: auto;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    font-size: 24px;
+    line-height: 1;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+[data-theme="light"] .theme-toggle::after {
+    content: '☀️';
+    transform: none;
+    color: initial;
+    background: transparent;
+}
+
+[data-theme="dark"] .theme-toggle::after {
+    content: '🌙';
+    transform: none;
+    color: initial;
+    background: transparent;
 }
 
 .theme-icon {
-    font-size: 1.2rem;
-    transition: var(--transition);
+    display: none !important;
 }
 
-.theme-icon.sun {
-    display: none;
-}
-
-.theme-icon.moon {
-    display: block;
-}
-
-[data-theme="light"] .theme-icon.sun {
-    display: block;
+[data-theme="dark"] .theme-icon.sun {
+    opacity: 0.3;
 }
 
 [data-theme="light"] .theme-icon.moon {
-    display: none;
+    opacity: 0.3;
+}
+
+.theme-icon.sun {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.theme-icon.moon {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(0);
+}
+
+[data-theme="light"] .theme-icon.sun {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(0);
+}
+
+[data-theme="light"] .theme-icon.moon {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(-90deg);
 }
 
 .nav-controls {
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
+    margin-left: auto;
+    flex-shrink: 0;
+    z-index: 1002;
 }
 
 .hamburger {
