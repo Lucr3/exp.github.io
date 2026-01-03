@@ -59,6 +59,13 @@ export function renderDumbbellPlot(container, datasets) {
     const hideTooltip = () => tooltip.style('opacity', 0).style('display', 'none');
 
     svg.selectAll('*').remove();
+
+    // Make SVG responsive
+    svg.attr('viewBox', '0 0 900 500')
+        .attr('preserveAspectRatio', 'xMidYMid meet')
+        .style('width', '100%')
+        .style('height', 'auto');
+
     const g = svg.append('g').attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
     const yScale = d3.scaleLinear()

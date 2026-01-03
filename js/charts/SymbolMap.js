@@ -24,7 +24,7 @@ export function renderSymbolMap(container, datasets) {
     const yearTrails = [];
     let lastYearIndex = 0;
 
-    const tooltip = d3.select('#symbolic-map-tooltip').empty() 
+    const tooltip = d3.select('#symbolic-map-tooltip').empty()
         ? d3.select('body').append('div').attr('id', 'symbolic-map-tooltip')
         : d3.select('#symbolic-map-tooltip');
 
@@ -40,6 +40,13 @@ export function renderSymbolMap(container, datasets) {
     });
 
     svg.selectAll('g.chart-root, rect.background').remove();
+
+    // Make SVG responsive
+    svg.attr('viewBox', '0 0 960 500')
+        .attr('preserveAspectRatio', 'xMidYMid meet')
+        .style('width', '100%')
+        .style('height', 'auto');
+
     svg.append('rect').attr('class', 'background').attr('width', 960).attr('height', 500).attr('fill', '#2d3436');
 
     const g = svg.append('g').attr('class', 'chart-root').attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
@@ -60,12 +67,12 @@ export function renderSymbolMap(container, datasets) {
             { selector: '#symbolic-map-zoom-in', scale: 1.3 },
             { selector: '#symbolic-map-zoom-out', scale: 0.7 }
         ].forEach(({ selector, scale }) => {
-            root.select(selector).on('click', () => 
+            root.select(selector).on('click', () =>
                 svg.transition().duration(300).call(zoom.scaleBy, scale)
             );
         });
 
-        root.select('#symbolic-map-zoom-reset').on('click', () => 
+        root.select('#symbolic-map-zoom-reset').on('click', () =>
             svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity.translate(0, 0).scale(1))
         );
     };
@@ -165,7 +172,7 @@ export function renderSymbolMap(container, datasets) {
             .style('font-size', '12px').style('fill', '#fff').text(d => d.label);
 
         let lx = 0;
-        items.each(function() {
+        items.each(function () {
             const width = 16 + 8 + d3.select(this).select('text').node().getBBox().width;
             d3.select(this).attr('transform', `translate(${lx}, 0)`);
             lx += width + 30;
@@ -218,7 +225,7 @@ export function renderSymbolMap(container, datasets) {
                         .attr('opacity', 0.3);
                 });
 
-                const tooltipHtml = (d, year) => 
+                const tooltipHtml = (d, year) =>
                     `<div style="text-align: center;"><strong>${d.location}</strong></div>` +
                     `<strong>Year:</strong> ${year}<br/><strong>Deaths:</strong> ${formatNum(d.deaths)}`;
 
@@ -257,8 +264,8 @@ export function renderSymbolMap(container, datasets) {
                     .style('fill', '#fff').attr('opacity', 0.7)
                     .text(selectedYear);
 
-                yearTrails.push({ 
-                    index: yearIndex, 
+                yearTrails.push({
+                    index: yearIndex,
                     data: bubbleData.map(d => ({
                         ...d,
                         radius: radiusScale(d.deaths),
@@ -269,16 +276,16 @@ export function renderSymbolMap(container, datasets) {
 
             update(years.length - 1);
 
-            yearSlider.on('input', function() { 
+            yearSlider.on('input', function () {
                 const newIndex = +this.value;
                 if (newIndex < lastYearIndex && newIndex < yearTrails.length) {
                     removeTrails(newIndex);
                 }
                 lastYearIndex = newIndex;
-                update(newIndex); 
+                update(newIndex);
             });
 
-            speedSlider.on('input', function() {
+            speedSlider.on('input', function () {
                 const speed = +this.value;
                 speedLabel.text((speed / 1000).toFixed(1) + 's');
                 if (isPlaying) {
@@ -299,7 +306,7 @@ export function renderSymbolMap(container, datasets) {
                 }, speed);
             };
 
-            playBtn.on('click', function() {
+            playBtn.on('click', function () {
                 isPlaying = !isPlaying;
                 if (isPlaying) {
                     const speed = +speedSlider.property('value');

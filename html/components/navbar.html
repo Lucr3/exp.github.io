@@ -1,9 +1,22 @@
 <nav class="navbar">
     <div class="logo">
-        <button id="logo-button" class="logo-btn" aria-label="Home button"><h1>Yemen Crisis</h1></button>
+        <button id="logo-button" class="logo-btn" aria-label="Home button">
+            <h1>Yemen Crisis</h1>
+        </button>
         <span class="subtitle">Data Visualization Project</span>
     </div>
-    <ul class="nav-links">
+    <div class="nav-controls">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Change theme">
+            <span class="theme-icon sun">☀️</span>
+            <span class="theme-icon moon">🌙</span>
+        </button>
+        <button class="hamburger" id="hamburger-menu" aria-label="Toggle navigation menu" aria-expanded="false">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
+    </div>
+    <ul class="nav-links" id="nav-links">
         <li><a href="#intro">Introduction</a></li>
         <li><a href="#chapter1-container">War and Disasters</a></li>
         <li><a href="#chapter2-container">The Economic Crisis</a></li>
@@ -12,8 +25,4 @@
         <li><a href="#chapter5-container">Global Attention</a></li>
         <li><a href="#about">About Us</a></li>
     </ul>
-    <button class="theme-toggle" id="theme-toggle" aria-label="Change theme">
-        <span class="theme-icon sun">☀️</span>
-        <span class="theme-icon moon">🌙</span>
-    </button>
 </nav>

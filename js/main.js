@@ -63,6 +63,25 @@ async function init() {
         document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
     });
 
+    // Hamburger menu toggle
+    const hamburger = document.getElementById('hamburger-menu');
+    const navLinks = document.getElementById('nav-links');
+
+    hamburger?.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navLinks.classList.toggle('active');
+        hamburger.setAttribute('aria-expanded', hamburger.classList.contains('active'));
+    });
+
+    // Close menu when clicking a nav link
+    navLinks?.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            hamburger?.classList.remove('active');
+            navLinks.classList.remove('active');
+            hamburger?.setAttribute('aria-expanded', 'false');
+        });
+    });
+
     renderGraph('SymbolMap-render', renderSymbolMap, datasets);
     renderGraph('Alluvional-render', renderAlluvional, datasets);
     renderGraph('ChoroplethMap-render', renderChoroplethMap, datasets);

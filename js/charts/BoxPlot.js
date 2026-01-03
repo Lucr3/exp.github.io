@@ -39,6 +39,13 @@ export function renderBoxPlot(container, datasets) {
 
   function updateBoxPlot(filterCategory = 'all') {
     svg.selectAll('g.chart-root').remove();
+
+    // Make SVG responsive
+    svg.attr('viewBox', '0 0 960 500')
+      .attr('preserveAspectRatio', 'xMidYMid meet')
+      .style('width', '100%')
+      .style('height', 'auto');
+
     const g = svg
       .append('g')
       .attr('class', 'chart-root')
@@ -555,7 +562,7 @@ export function renderBoxPlot(container, datasets) {
       .call(g => g.selectAll('.tick line')
         .attr('stroke', textMut)
         .attr('stroke-opacity', 0.2)
-        .attr('stroke-dasharray', '2,2')) 
+        .attr('stroke-dasharray', '2,2'))
       .style('font-size', '10px')
       .style('color', textMut);
 

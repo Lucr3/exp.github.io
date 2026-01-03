@@ -75,6 +75,12 @@ export function renderStackedArea(container, datasets) {
     function renderChart(domain) {
         svg.selectAll('*').remove();
 
+        // Make SVG responsive
+        svg.attr('viewBox', '0 0 960 450')
+            .attr('preserveAspectRatio', 'xMidYMid meet')
+            .style('width', '100%')
+            .style('height', 'auto');
+
         const g = svg.append('g').attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
         svg.append('defs').append('clipPath').attr('id', 'clip-area')
