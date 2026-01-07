@@ -327,7 +327,7 @@ export function renderChoroplethMap(container, datasets) {
                 .attr('y', rectSize / 2)
                 .attr('alignment-baseline', 'middle')
                 .style('font-size', '10px')
-                .style('fill', 'var(--text-color)')
+                .style('fill', '#fff')
                 .text(d => d.value);
 
             let x = 0;
@@ -450,7 +450,7 @@ export function renderChoroplethMap(container, datasets) {
                     .attr('text-anchor', 'end')
                     .attr('font-size', 48)
                     .attr('font-weight', 'bold')
-                    .attr('fill', 'var(--text-color)')
+                    .attr('fill', '#fff')
                     .style('pointer-events', 'none')
                     .attr('opacity', 0)
                     .merge(yearLabelSelection)

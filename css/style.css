@@ -93,6 +93,19 @@
     fill: #1a1a1a !important;
 }
 
+[data-theme="light"] svg g.legend-item text {
+    fill: #fff !important;
+}
+
+[data-theme="light"] svg text.year-label {
+    fill: #fff !important;
+    opacity: 1 !important;
+}
+
+[data-theme="light"] svg .legend text {
+    fill: #fff !important;
+}
+
 [data-theme="light"] svg text[style*="fill:#69b3e7"],
 [data-theme="light"] svg text[style*="fill: #69b3e7"] {
     fill: #0077cc !important;
