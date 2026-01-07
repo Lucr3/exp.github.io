@@ -167,7 +167,7 @@ export function renderStackedBarChart(container, datasets) {
         .style('fill', textColor)
         .style('font-size', '14px')
         .style('font-weight', 'bold')
-        .text('Primary Education Completion Rate (Yemen)');
+        .text('Primary Education Completion Rate');
 
 
     subgroups.forEach(key => {

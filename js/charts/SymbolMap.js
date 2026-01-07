@@ -181,8 +181,26 @@ export function renderSymbolMap(container, datasets) {
         legend.attr('transform', `translate(${MARGIN.left + Math.max(0, (WIDTH - (lx - 30)) / 2)}, ${HEIGHT + MARGIN.top - 465})`);
     };
 
-    d3.json('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson')
+    d3.json('datasets/yemen_admin1.geojson')
         .then(topo => {
+            // Fix coordinate order
+            topo.features.forEach(feature => {
+                if (feature.geometry.type === "Polygon") {
+                    feature.geometry.coordinates.forEach(ring => {
+                        ring.reverse();
+                    });
+                } else if (feature.geometry.type === "MultiPolygon") {
+                    feature.geometry.coordinates.forEach(polygon => {
+                        polygon.forEach(ring => {
+                            ring.reverse();
+                        });
+                    });
+                }
+            });
+            
+            // Adjust projection to fit the data
+            projection.fitSize([WIDTH, HEIGHT], { type: 'FeatureCollection', features: topo.features });
+            
             renderLegend();
 
             const update = yearIndex => {
@@ -258,7 +276,7 @@ export function renderSymbolMap(container, datasets) {
                 g.selectAll('.year-label').remove();
                 g.append('text')
                     .attr('class', 'year-label')
-                    .attr('x', WIDTH - 10).attr('y', HEIGHT - 20)
+                    .attr('x', WIDTH - 10).attr('y', HEIGHT - 80)
                     .attr('text-anchor', 'end')
                     .attr('font-size', 48).attr('font-weight', 'bold')
                     .style('fill', '#fff').attr('opacity', 0.7)

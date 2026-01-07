@@ -457,7 +457,7 @@ export function renderChoroplethMap(container, datasets) {
                     .text(d => d)
                     .transition()
                     .duration(200)
-                    .attr('opacity', 0.15);
+                    .attr('opacity', 0.7);
             }
 
 
