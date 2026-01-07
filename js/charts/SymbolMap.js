@@ -42,11 +42,10 @@ export function renderSymbolMap(container, datasets) {
     svg.selectAll('g.chart-root, rect.background').remove();
 
 
-    svg.attr('viewBox', `0 0 960 450`)
+    svg.attr('viewBox', `0 0 960 500`)
         .attr('preserveAspectRatio', 'xMidYMid meet')
         .style('width', '100%')
         .style('height', 'auto')
-        .style('min-height', '450px')
         .style('background', 'transparent');
     svg.append('rect').attr('class', 'background').attr('width', 960).attr('height', 500).attr('fill', '#2d3436');
 
@@ -259,7 +258,7 @@ export function renderSymbolMap(container, datasets) {
                 g.selectAll('.year-label').remove();
                 g.append('text')
                     .attr('class', 'year-label')
-                    .attr('x', WIDTH - 10).attr('y', HEIGHT - 10)
+                    .attr('x', WIDTH - 10).attr('y', HEIGHT - 20)
                     .attr('text-anchor', 'end')
                     .attr('font-size', 48).attr('font-weight', 'bold')
                     .style('fill', '#fff').attr('opacity', 0.7)

@@ -1216,14 +1216,15 @@ footer {
     width: 100%;
     height: auto;
     display: block;
+    max-width: 1200px;
 }
 
 .symbolic-map-wrapper {
     position: relative;
-    width: 960px;
-    aspect-ratio: 960 / 500;
+    width: 100%;
+    max-width: 100%;
     margin: 0 auto;
-    overflow: hidden;
+    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
