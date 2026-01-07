@@ -87,7 +87,7 @@ export function renderAlluvional(container, datasets) {
     const drawChart = (yearStart, yearEnd) => {
         svg.selectAll('*').remove();
 
-        const margin = { top: 40, right: 200, bottom: 40, left: 200 };
+        const margin = { top: 60, right: 200, bottom: 40, left: 200 };
         const containerNode = root.node();
         const containerWidth = containerNode ? Math.max(800, Math.round(containerNode.getBoundingClientRect().width)) : 1200;
         const fullWidth = containerWidth;
@@ -367,8 +367,8 @@ export function renderAlluvional(container, datasets) {
             .data(columnTitles)
             .join('text')
             .attr('x', (d, i) => columnX[i])
-            .attr('y', 22)
-            .attr('text-anchor', 'middle')
+            .attr('y', 35)
+            .attr('text-anchor', (d, i) => i === 0 ? 'start' : (i === 3 ? 'end' : 'middle'))
             .attr('font-size', '15px')
             .attr('font-weight', 'bold')
             .attr('font-family', 'Roboto Slab, serif')
