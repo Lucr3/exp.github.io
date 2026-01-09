@@ -152,38 +152,129 @@ export function renderSpiralChart(container, datasets) {
 
     const arcGenerator = d3.arc();
 
-    rawData.forEach(d => {
-        const yearIndex = years.indexOf(d.year);
-        if (yearIndex === -1) return;
+    let selectedSegment = null;
 
-        const radius = radiusScale(yearIndex);
-        const startAngle = angleScale(d.month) - Math.PI / 2;
-        const endAngle = angleScale(d.month + 1) - Math.PI / 2;
+    g.append('circle')
+        .attr('class', 'background-click-area')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', OUTER_RADIUS + 50)
+        .attr('fill', 'transparent')
+        .style('cursor', 'pointer')
+        .on('click', function (event) {
+            if (event.target === this) {
+                resetAllSegments();
+            }
+        });
 
-        const thickness = 8 + yearIndex * 0.5;
+    g.append('circle')
+        .attr('class', 'center-click-area')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', INNER_RADIUS)
+        .attr('fill', 'transparent')
+        .style('cursor', 'pointer')
+        .on('click', function () {
+            resetAllSegments();
+        });
 
-        g.append('path')
-            .datum(d)
-            .attr('d', arcGenerator({
-                innerRadius: radius - thickness / 2,
-                outerRadius: radius + thickness / 2,
-                startAngle: startAngle,
-                endAngle: endAngle
-            }))
-            .attr('fill', colorScale(d.interest))
-            .attr('stroke', bgColor)
-            .attr('stroke-width', 0.5)
-            .style('cursor', 'pointer')
-            .on('mouseover', function (event, datum) {
-                d3.select(this).attr('stroke', textColor).attr('stroke-width', 2);
-                showTooltip(event, datum);
-            })
-            .on('mousemove', moveTooltip)
-            .on('mouseleave', function () {
-                d3.select(this).attr('stroke', bgColor).attr('stroke-width', 0.5);
-                hideTooltip();
-            });
-    });
+    const segments = g.selectAll('path.segment')
+        .data(rawData)
+        .join('path')
+        .attr('class', 'segment')
+        .each(function(d) {
+            const yearIndex = years.indexOf(d.year);
+            if (yearIndex === -1) return;
+
+            const radius = radiusScale(yearIndex);
+            const startAngle = angleScale(d.month) - Math.PI / 2;
+            const endAngle = angleScale(d.month + 1) - Math.PI / 2;
+            const thickness = 8 + yearIndex * 0.5;
+
+            d3.select(this)
+                .attr('d', arcGenerator({
+                    innerRadius: radius - thickness / 2,
+                    outerRadius: radius + thickness / 2,
+                    startAngle: startAngle,
+                    endAngle: endAngle
+                }))
+                .attr('fill', colorScale(d.interest))
+                .attr('stroke', bgColor)
+                .attr('stroke-width', 0.5);
+        })
+        .style('cursor', 'pointer')
+        .style('opacity', 0)
+        .transition()
+        .duration(150)
+        .delay((d, i) => i * 25)
+        .ease(d3.easeCubicOut)
+        .style('opacity', 1);
+
+    g.selectAll('path.segment')
+        .on('mouseover', function (event, datum) {
+            d3.select(this).attr('stroke', textColor).attr('stroke-width', 2);
+            showTooltip(event, datum);
+        })
+        .on('mousemove', moveTooltip)
+        .on('mouseleave', function () {
+            d3.select(this).attr('stroke', bgColor).attr('stroke-width', 0.5);
+            hideTooltip();
+        })
+        .on('click', function (event, d) {
+            event.stopPropagation();
+            const clickedKey = `${d.year}-${d.month}`;
+            
+            if (selectedSegment === clickedKey) {
+                resetAllSegments();
+            } else {
+                selectedSegment = clickedKey;
+                
+                const clickedIndex = rawData.findIndex(datum => `${datum.year}-${datum.month}` === clickedKey);
+                
+                g.selectAll('path.segment')
+                    .transition()
+                    .duration(200)
+                    .style('opacity', 0);
+                
+                setTimeout(() => {
+                    g.selectAll('path.segment')
+                        .filter(datum => `${datum.year}-${datum.month}` !== clickedKey)
+                        .transition()
+                        .duration(150)
+                        .delay((d, i) => i * 25)
+                        .ease(d3.easeCubicOut)
+                        .style('opacity', 0.15);
+                    
+                    g.selectAll('path.segment')
+                        .filter(datum => `${datum.year}-${datum.month}` === clickedKey)
+                        .transition()
+                        .duration(500)
+                        .delay(clickedIndex * 25)
+                        .ease(d3.easeBackOut.overshoot(0.5))
+                        .style('opacity', 1);
+                }, 200);
+            }
+        });
+
+    function resetAllSegments() {
+        if (selectedSegment === null) return;
+        
+        selectedSegment = null;
+        
+        g.selectAll('path.segment')
+            .transition()
+            .duration(200)
+            .style('opacity', 0);
+        
+        setTimeout(() => {
+            g.selectAll('path.segment')
+                .transition()
+                .duration(150)
+                .delay((d, i) => i * 25)
+                .ease(d3.easeCubicOut)
+                .style('opacity', 1);
+        }, 200);
+    }
 
     years.filter((_, i) => i % 3 === 0 || i === numYears - 1).forEach((year, idx) => {
         const yearIndex = years.indexOf(year);
