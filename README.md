@@ -34,7 +34,7 @@ The notebook in the `Code/` folder (`Cleaner.ipynb`) handles:
 * **Output:** Generation of optimized CSV/JSON files in the `datasets/` folder.
 
 ### 2. Frontend & Visualization (D3.js)
-The frontend loads processed data via `dataLoader.js` and renders it using **D3.js (v7)**. The architecture is modular: each chart is an independent JavaScript component.
+The frontend loads processed data via `dataLoader.js` and renders it using D3.js. The architecture is modular: each chart is an independent JavaScript component.
 
 ---
 
