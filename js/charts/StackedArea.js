@@ -82,10 +82,23 @@ export function renderStackedArea(container, datasets) {
 
         const g = svg.append('g').attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
-        svg.append('defs').append('clipPath').attr('id', 'clip-area')
+        const defs = svg.append('defs');
+        defs.append('clipPath').attr('id', 'clip-area')
             .append('rect').attr('width', WIDTH).attr('height', HEIGHT);
 
-        const chartArea = g.append('g').attr('clip-path', 'url(#clip-area)');
+        const animClip = defs.append('clipPath').attr('id', 'clip-animation')
+            .append('rect')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('width', 0)
+            .attr('height', HEIGHT);
+
+        animClip.transition()
+            .duration(1200)
+            .ease(d3.easeQuadOut)
+            .attr('width', WIDTH);
+
+        const chartArea = g.append('g').attr('clip-path', 'url(#clip-animation)');
 
         const xScale = d3.scaleLinear().domain(domain).range([0, WIDTH]);
         const filteredData = data.filter(d => d.year >= domain[0] && d.year <= domain[1]);
