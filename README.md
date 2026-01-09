@@ -53,7 +53,7 @@ The project includes various advanced visualization techniques:
 
 ---
 
-## 📂 Repository Structure
+## Repository Structure
 
 ```plaintext
 .
