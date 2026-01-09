@@ -92,20 +92,47 @@ export function renderHistogram(container, datasets) {
         .style('stroke-dasharray', '3,3')
         .select('.domain').remove();
 
-    g.selectAll('rect.bar')
+    let selectedBar = null;
+
+    g.append('rect')
+        .attr('class', 'background-click-area')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', WIDTH)
+        .attr('height', HEIGHT)
+        .attr('fill', 'transparent')
+        .style('cursor', 'pointer')
+        .on('click', function (event) {
+            if (event.target === this) {
+                resetAllBars();
+            }
+        });
+
+    const bars = g.selectAll('rect.bar')
         .data(histogramData)
         .join('rect')
         .attr('class', 'bar')
         .attr('x', d => x(d.label))
-        .attr('y', d => y(d.length))
+        .attr('y', HEIGHT)
         .attr('width', x.bandwidth())
-        .attr('height', d => HEIGHT - y(d.length))
+        .attr('height', 0)
         .attr('rx', 2)
         .attr('ry', 2)
         .attr('fill', barColor)
         .style('opacity', 0.9)
+        .style('cursor', 'pointer')
+        .transition()
+        .duration(800)
+        .delay((d, i) => i * 80)
+        .ease(d3.easeBackOut.overshoot(0.3))
+        .attr('y', d => y(d.length))
+        .attr('height', d => HEIGHT - y(d.length));
+
+    g.selectAll('rect.bar')
         .on('mouseover', function (event, d) {
-            d3.select(this).style('opacity', 1);
+            if (selectedBar === null) {
+                d3.select(this).style('opacity', 1);
+            }
             showTooltip(event, `
                 <div style="font-family: var(--font-body); line-height: 1.6;">
                     <strong style="font-size: 14px; border-bottom: 1px solid #555; padding-bottom: 4px; display:block; margin-bottom:8px;">Range: ${d.label}</strong>
@@ -118,9 +145,63 @@ export function renderHistogram(container, datasets) {
         })
         .on('mousemove', moveTooltip)
         .on('mouseleave', function () {
-            d3.select(this).style('opacity', 0.9);
+            if (selectedBar === null) {
+                d3.select(this).style('opacity', 0.9);
+            }
             hideTooltip();
+        })
+        .on('click', function (event, d) {
+            event.stopPropagation();
+            const clickedLabel = d.label;
+            
+            if (selectedBar === clickedLabel) {
+                resetAllBars();
+            } else {
+                selectedBar = clickedLabel;
+                
+                g.selectAll('rect.bar')
+                    .transition()
+                    .duration(300)
+                    .style('opacity', d => d.label === clickedLabel ? 0 : 0.2)
+                    .attr('y', d => d.label === clickedLabel ? HEIGHT : y(d.length))
+                    .attr('height', d => d.label === clickedLabel ? 0 : HEIGHT - y(d.length));
+                
+                setTimeout(() => {
+                    g.selectAll('rect.bar')
+                        .filter(d => d.label === clickedLabel)
+                        .transition()
+                        .duration(500)
+                        .ease(d3.easeBackOut.overshoot(0.5))
+                        .attr('y', d => y(d.length))
+                        .attr('height', d => HEIGHT - y(d.length))
+                        .style('opacity', 1);
+                }, 300);
+            }
         });
+
+    function resetAllBars() {
+        if (selectedBar === null) return;
+        
+        selectedBar = null;
+        
+        g.selectAll('rect.bar')
+            .transition()
+            .duration(200)
+            .attr('y', HEIGHT)
+            .attr('height', 0)
+            .style('opacity', 0);
+        
+        setTimeout(() => {
+            g.selectAll('rect.bar')
+                .transition()
+                .duration(800)
+                .delay((d, i) => i * 80)
+                .ease(d3.easeBackOut.overshoot(0.3))
+                .attr('y', d => y(d.length))
+                .attr('height', d => HEIGHT - y(d.length))
+                .style('opacity', 0.9);
+        }, 200);
+    }
 
     g.append('text')
         .attr('x', WIDTH / 2)

@@ -81,6 +81,21 @@ export function renderStackedBarChart(container, datasets) {
         .keys(subgroups)
         (data);
 
+    let selectedYear = null;
+
+    g.append('rect')
+        .attr('class', 'background-click-area')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', WIDTH)
+        .attr('height', HEIGHT)
+        .attr('fill', 'transparent')
+        .style('cursor', 'pointer')
+        .on('click', function (event) {
+            if (event.target === this) {
+                resetAllBars();
+            }
+        });
 
     const layers = g.append('g')
         .selectAll('g')
@@ -93,14 +108,25 @@ export function renderStackedBarChart(container, datasets) {
         .data(d => d)
         .join('rect')
         .attr('x', d => x(d.data.year))
-        .attr('y', d => y(d[1]))
-        .attr('height', d => y(d[0]) - y(d[1]))
+        .attr('y', HEIGHT)
+        .attr('height', 0)
         .attr('width', x.bandwidth())
         .attr('rx', 2)
         .attr('ry', 2)
         .style('opacity', 0.9)
+        .style('cursor', 'pointer')
+        .transition()
+        .duration(800)
+        .delay(d => years.indexOf(d.data.year) * 80)
+        .ease(d3.easeBackOut.overshoot(0.3))
+        .attr('y', d => y(d[1]))
+        .attr('height', d => y(d[0]) - y(d[1]));
+
+    layers.selectAll('rect')
         .on('mouseover', function (event, d) {
-            d3.select(this).style('opacity', 1);
+            if (selectedYear === null) {
+                d3.select(this).style('opacity', 1);
+            }
             const subgroupName = d3.select(this.parentNode).datum().key;
             const value = d.data[subgroupName];
             showTooltip(event, `
@@ -116,9 +142,86 @@ export function renderStackedBarChart(container, datasets) {
         })
         .on('mousemove', moveTooltip)
         .on('mouseleave', function () {
-            d3.select(this).style('opacity', 0.9);
+            if (selectedYear === null) {
+                d3.select(this).style('opacity', 0.9);
+            }
             hideTooltip();
+        })
+        .on('click', function (event, d) {
+            event.stopPropagation();
+            const clickedYear = d.data.year;
+            
+            if (selectedYear === clickedYear) {
+                resetAllBars();
+            } else {
+                selectedYear = clickedYear;
+                
+                layers.selectAll('rect')
+                    .transition()
+                    .duration(300)
+                    .style('opacity', d => d.data.year === clickedYear ? 0 : 0.2)
+                    .attr('y', d => d.data.year === clickedYear ? HEIGHT : y(d[1]))
+                    .attr('height', d => d.data.year === clickedYear ? 0 : y(d[0]) - y(d[1]));
+                
+                g.selectAll('text.bar-label')
+                    .transition()
+                    .duration(300)
+                    .style('opacity', d => d.data.year === clickedYear ? 0 : 0.2);
+                
+                setTimeout(() => {
+                    layers.selectAll('rect')
+                        .filter(d => d.data.year === clickedYear)
+                        .transition()
+                        .duration(500)
+                        .ease(d3.easeBackOut.overshoot(0.5))
+                        .attr('y', d => y(d[1]))
+                        .attr('height', d => y(d[0]) - y(d[1]))
+                        .style('opacity', 1);
+                    
+                    g.selectAll('text.bar-label')
+                        .filter(d => d.data.year === clickedYear)
+                        .transition()
+                        .duration(500)
+                        .delay(200)
+                        .style('opacity', 1);
+                }, 300);
+            }
         });
+
+    function resetAllBars() {
+        if (selectedYear === null) return;
+        
+        selectedYear = null;
+        
+        layers.selectAll('rect')
+            .transition()
+            .duration(200)
+            .attr('y', HEIGHT)
+            .attr('height', 0)
+            .style('opacity', 0);
+        
+        g.selectAll('text.bar-label')
+            .transition()
+            .duration(200)
+            .style('opacity', 0);
+        
+        setTimeout(() => {
+            layers.selectAll('rect')
+                .transition()
+                .duration(800)
+                .delay(d => years.indexOf(d.data.year) * 80)
+                .ease(d3.easeBackOut.overshoot(0.3))
+                .attr('y', d => y(d[1]))
+                .attr('height', d => y(d[0]) - y(d[1]))
+                .style('opacity', 0.9);
+            
+            g.selectAll('text.bar-label')
+                .transition()
+                .duration(800)
+                .delay(d => years.indexOf(d.data.year) * 80 + 400)
+                .style('opacity', 1);
+        }, 200);
+    }
 
     g.append('g')
         .attr('transform', `translate(0,${HEIGHT})`)
@@ -143,6 +246,7 @@ export function renderStackedBarChart(container, datasets) {
         g.selectAll(`.label-${layer.key}`)
             .data(layer)
             .join('text')
+            .attr('class', 'bar-label')
             .filter(d => (y(d[0]) - y(d[1])) > 25)
             .attr('x', d => x(d.data.year) + x.bandwidth() / 2)
             .attr('y', d => y(d[1]) + (y(d[0]) - y(d[1])) / 2)
@@ -152,12 +256,16 @@ export function renderStackedBarChart(container, datasets) {
             .style('font-size', '12px')
             .style('font-weight', 'bold')
             .style('pointer-events', 'none')
-
+            .style('opacity', 0)
             .style('text-shadow', '0px 1px 3px rgba(0,0,0,0.5)')
             .text(d => {
                 const val = d[1] - d[0];
                 return val.toFixed(0) + '%';
-            });
+            })
+            .transition()
+            .duration(400)
+            .delay(d => years.indexOf(d.data.year) * 80 + 400)
+            .style('opacity', 1);
     });
 
     g.append('text')
