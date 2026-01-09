@@ -208,6 +208,17 @@ export function renderAlluvional(container, datasets) {
 
         const g = svg.append('g').attr('clip-path', `url(#${clipId})`);
 
+        g.append('rect')
+            .attr('class', 'background-click')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('width', fullWidth)
+            .attr('height', fullHeight)
+            .attr('fill', 'transparent')
+            .style('cursor', 'pointer');
+
+        let selectedNode = null;
+
         const getLinkColor = (link) => {
             let current = link.source;
             while (current && current.level > 0) {
@@ -254,6 +265,7 @@ export function renderAlluvional(container, datasets) {
             .attr('stroke-opacity', 0.5)
             .style('cursor', 'pointer')
             .on('mouseover', function (event, d) {
+                if (selectedNode !== null) return;
                 const percentage = ((d.value / d.source.value) * 100).toFixed(1);
                 linkGroup.selectAll('path').transition().duration(200)
                     .attr('stroke-opacity', l => (l.source.id === d.source.id && l.target.id === d.target.id) ? 0.85 : 0.1);
@@ -269,9 +281,29 @@ export function renderAlluvional(container, datasets) {
             })
             .on('mousemove', event => tooltip.style('left', (event.clientX + 15) + 'px').style('top', (event.clientY + 15) + 'px'))
             .on('mouseout', () => {
+                if (selectedNode !== null) return;
                 linkGroup.selectAll('path').transition().duration(200).attr('stroke-opacity', 0.5);
                 nodeGroup.selectAll('g.node').transition().duration(200).style('opacity', 1);
                 hideTooltip();
+            })
+            .on('click', function(event, d) {
+                event.stopPropagation();
+                
+                const linkKey = `link_${d.source.id}_${d.target.id}`;
+                
+                if (selectedNode === linkKey) {
+                    animateResetLeftToRight();
+                } else {
+                    selectedNode = linkKey;
+                    
+                    const pathToSource = findPathToNode(d.source.id);
+                    const pathFromTarget = findAllLinksFromNode(d.target.id);
+                    
+                    const connectedLinks = new Set([d, ...pathToSource.links, ...pathFromTarget.links]);
+                    const connectedNodes = new Set([d.source.id, d.target.id, ...pathToSource.nodes, ...pathFromTarget.nodes]);
+                    
+                    animateHighlightLeftToRight(connectedLinks, connectedNodes);
+                }
             });
 
         const nodeGroup = g.append('g').attr('class', 'nodes');
@@ -292,6 +324,154 @@ export function renderAlluvional(container, datasets) {
             linkGroup.selectAll('path').transition().duration(200).attr('stroke-opacity', 0.5);
             nodeGroup.selectAll('g.node').transition().duration(200).style('opacity', 1);
         };
+
+        const findAllLinksFromNode = (nodeId) => {
+            const connectedLinks = new Set();
+            const connectedNodes = new Set([nodeId]);
+            
+            const traverse = (currentId) => {
+                sankeyData.links.forEach(l => {
+                    if (l.source.id === currentId && !connectedLinks.has(l)) {
+                        connectedLinks.add(l);
+                        connectedNodes.add(l.target.id);
+                        traverse(l.target.id);
+                    }
+                });
+            };
+            traverse(nodeId);
+            return { links: connectedLinks, nodes: connectedNodes };
+        };
+
+        const findPathToNode = (nodeId) => {
+            const connectedLinks = new Set();
+            const connectedNodes = new Set([nodeId]);
+            
+            const traverseBack = (currentId) => {
+                sankeyData.links.forEach(l => {
+                    if (l.target.id === currentId && !connectedLinks.has(l)) {
+                        connectedLinks.add(l);
+                        connectedNodes.add(l.source.id);
+                        traverseBack(l.source.id);
+                    }
+                });
+            };
+            traverseBack(nodeId);
+            return { links: connectedLinks, nodes: connectedNodes };
+        };
+
+        const animateHighlightLeftToRight = (connectedLinks, connectedNodes) => {
+            linkGroup.selectAll('path')
+                .transition()
+                .duration(400)
+                .ease(d3.easeCubicOut)
+                .attr('stroke-opacity', 0.06);
+            
+            nodeGroup.selectAll('g.node')
+                .transition()
+                .duration(400)
+                .ease(d3.easeCubicOut)
+                .style('opacity', 0.12);
+
+            const linksByLevel = [[], [], []];
+            connectedLinks.forEach(l => {
+                if (l.source.level === 0) linksByLevel[0].push(l);
+                else if (l.source.level === 1) linksByLevel[1].push(l);
+                else linksByLevel[2].push(l);
+            });
+
+            linksByLevel.forEach((levelLinks, levelIndex) => {
+                linkGroup.selectAll('path')
+                    .filter(l => levelLinks.includes(l))
+                    .transition()
+                    .duration(600)
+                    .delay(400 + levelIndex * 250)
+                    .ease(d3.easeCubicInOut)
+                    .attr('stroke-opacity', 0.8);
+            });
+
+            [0, 1, 2, 3].forEach(level => {
+                nodeGroup.selectAll('g.node')
+                    .filter(n => connectedNodes.has(n.id) && n.level === level)
+                    .transition()
+                    .duration(600)
+                    .delay(400 + level * 250)
+                    .ease(d3.easeCubicInOut)
+                    .style('opacity', 1);
+            });
+        };
+
+        const animateResetLeftToRight = () => {
+            selectedNode = null;
+
+            linkGroup.selectAll('path')
+                .transition()
+                .duration(300)
+                .ease(d3.easeCubicOut)
+                .attr('stroke-opacity', 0);
+            
+            nodeGroup.selectAll('g.node')
+                .transition()
+                .duration(300)
+                .ease(d3.easeCubicOut)
+                .style('opacity', 0);
+
+            setTimeout(() => {
+                [0, 1, 2, 3].forEach(level => {
+                    nodeGroup.selectAll('g.node')
+                        .filter(n => n.level === level)
+                        .transition()
+                        .duration(500)
+                        .delay(level * 180)
+                        .ease(d3.easeCubicInOut)
+                        .style('opacity', 1);
+                });
+
+                [0, 1, 2].forEach(level => {
+                    linkGroup.selectAll('path')
+                        .filter(l => l.source.level === level)
+                        .transition()
+                        .duration(500)
+                        .delay(level * 180 + 80)
+                        .ease(d3.easeCubicInOut)
+                        .attr('stroke-opacity', 0.5);
+                });
+            }, 300);
+        };
+
+        const handleNodeClick = (event, d) => {
+            event.stopPropagation();
+            
+            const clickedKey = d.id;
+            
+            if (selectedNode === clickedKey) {
+                animateResetLeftToRight();
+            } else {
+                selectedNode = clickedKey;
+                
+                let result;
+                if (d.level === 0) {
+                    result = findAllLinksFromNode(d.id);
+                } else if (d.level === 3) {
+                    result = findPathToNode(d.id);
+                } else {
+                    const fromNode = findAllLinksFromNode(d.id);
+                    const toNode = findPathToNode(d.id);
+                    result = {
+                        links: new Set([...fromNode.links, ...toNode.links]),
+                        nodes: new Set([...fromNode.nodes, ...toNode.nodes])
+                    };
+                }
+                
+                animateHighlightLeftToRight(result.links, result.nodes);
+            }
+        };
+
+        g.select('.background-click')
+            .on('click', function(event) {
+                if (selectedNode !== null) {
+                    animateResetLeftToRight();
+                }
+            });
 
         const showNodeTooltip = (event, d) => {
             const totalValue = d.value || 0;
@@ -319,16 +499,21 @@ export function renderAlluvional(container, datasets) {
             .attr('rx', 4).attr('ry', 4)
             .style('cursor', 'pointer')
             .on('mouseover', function (event, d) {
-                highlightPath(d);
-                d3.select(this).attr('stroke', '#fff').attr('stroke-width', 2);
-                showNodeTooltip(event, d);
+                if (selectedNode === null) {
+                    highlightPath(d);
+                    d3.select(this).attr('stroke', '#fff').attr('stroke-width', 2);
+                    showNodeTooltip(event, d);
+                }
             })
             .on('mousemove', event => tooltip.style('left', (event.clientX + 15) + 'px').style('top', (event.clientY + 15) + 'px'))
             .on('mouseout', function () {
-                resetHighlight();
-                hideTooltip();
-                d3.select(this).attr('stroke', 'none');
-            });
+                if (selectedNode === null) {
+                    resetHighlight();
+                    hideTooltip();
+                    d3.select(this).attr('stroke', 'none');
+                }
+            })
+            .on('click', handleNodeClick);
 
         nodeElements.append('text')
             .attr('x', d => d.level === 3 ? d.x1 + 8 : d.x0 - 8)
@@ -343,16 +528,21 @@ export function renderAlluvional(container, datasets) {
             .text(d => truncateLabel(d.name, d.level === 0 ? 25 : 22))
             .style('cursor', 'pointer')
             .on('mouseover', function (event, d) {
-                highlightPath(d);
-                d3.select(this.parentNode).select('rect').attr('stroke', '#fff').attr('stroke-width', 2);
-                showNodeTooltip(event, d);
+                if (selectedNode === null) {
+                    highlightPath(d);
+                    d3.select(this.parentNode).select('rect').attr('stroke', '#fff').attr('stroke-width', 2);
+                    showNodeTooltip(event, d);
+                }
             })
             .on('mousemove', event => tooltip.style('left', (event.clientX + 15) + 'px').style('top', (event.clientY + 15) + 'px'))
             .on('mouseout', function () {
-                resetHighlight();
-                hideTooltip();
-                d3.select(this.parentNode).select('rect').attr('stroke', 'none');
-            });
+                if (selectedNode === null) {
+                    resetHighlight();
+                    hideTooltip();
+                    d3.select(this.parentNode).select('rect').attr('stroke', 'none');
+                }
+            })
+            .on('click', handleNodeClick);
 
         const columnTitles = ['Subgroup', 'Type', 'Subtype', 'Event'];
         const columnX = [
