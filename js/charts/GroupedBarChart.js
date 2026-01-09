@@ -98,42 +98,150 @@ export function renderGroupedBarChart(container, datasets) {
             .join('rect')
             .attr('class', subgroup)
             .attr('x', d => xSubgroup(subgroup))
-            .attr('y', d => d[subgroup] ? y(d[subgroup]) : y(0))
+            .attr('y', HEIGHT)
             .attr('width', xSubgroup.bandwidth())
-            .attr('height', d => d[subgroup] ? HEIGHT - y(d[subgroup]) : 0)
+            .attr('height', 0) 
             .attr('rx', 2)
             .attr('ry', 2)
             .attr('fill', color(subgroup))
             .style('opacity', 0.9)
-            .on('mouseover', function (event, d) {
-                d3.select(this).style('opacity', 1);
-                showTooltip(event, `
-                    <div style="font-family: var(--font-body); line-height: 1.6;">
-                        <strong style="font-size: 14px; border-bottom: 1px solid #555; padding-bottom: 4px; display:block; margin-bottom:8px;">${d.year}</strong>
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                            <span style="width:10px; height:10px; background:${color('Primary')}; display:inline-block; margin-right:6px; border-radius:2px;"></span>
-                            <span style="margin-right:12px;">Primary:</span>
-                            <strong style="color:${color('Primary')}">${d.Primary ? d.Primary.toFixed(2) + '%' : 'No available data'}</strong>
-                        </div>
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                            <span style="width:10px; height:10px; background:${color('Secondary')}; display:inline-block; margin-right:6px; border-radius:2px;"></span>
-                            <span style="margin-right:12px;">Secondary:</span>
-                            <strong style="color:${color('Secondary')}">${d.Secondary ? d.Secondary.toFixed(2) + '%' : 'No available data'}</strong>
-                        </div>
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="width:10px; height:10px; background:${color('Tertiary')}; display:inline-block; margin-right:6px; border-radius:2px;"></span>
-                            <span style="margin-right:12px;">Tertiary:</span>
-                            <strong style="color:${color('Tertiary')}">${d.Tertiary ? d.Tertiary.toFixed(2) + '%' : 'No available data'}</strong>
-                        </div>
-                    </div>
-                `);
-            })
-            .on('mousemove', moveTooltip)
-            .on('mouseleave', function () {
-                d3.select(this).style('opacity', 0.9);
-                hideTooltip();
-            });
+            .style('cursor', 'pointer')
+            .transition() 
+            .duration(800)
+            .delay((d, i) => years.indexOf(d.year) * 80) 
+            .ease(d3.easeBackOut.overshoot(0.3))
+            .attr('y', d => d[subgroup] ? y(d[subgroup]) : y(0))
+            .attr('height', d => d[subgroup] ? HEIGHT - y(d[subgroup]) : 0);
     });
+
+    let selectedYear = null;
+
+    groups.selectAll('rect')
+        .on('mouseover', function (event, d) {
+            if (selectedYear === null) {
+                d3.select(this).style('opacity', 1);
+            }
+            showTooltip(event, `
+                <div style="font-family: var(--font-body); line-height: 1.6;">
+                    <strong style="font-size: 14px; border-bottom: 1px solid #555; padding-bottom: 4px; display:block; margin-bottom:8px;">${d.year}</strong>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <span style="width:10px; height:10px; background:${color('Primary')}; display:inline-block; margin-right:6px; border-radius:2px;"></span>
+                        <span style="margin-right:12px;">Primary:</span>
+                        <strong style="color:${color('Primary')}">${d.Primary ? d.Primary.toFixed(2) + '%' : 'No available data'}</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <span style="width:10px; height:10px; background:${color('Secondary')}; display:inline-block; margin-right:6px; border-radius:2px;"></span>
+                        <span style="margin-right:12px;">Secondary:</span>
+                        <strong style="color:${color('Secondary')}">${d.Secondary ? d.Secondary.toFixed(2) + '%' : 'No available data'}</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="width:10px; height:10px; background:${color('Tertiary')}; display:inline-block; margin-right:6px; border-radius:2px;"></span>
+                        <span style="margin-right:12px;">Tertiary:</span>
+                        <strong style="color:${color('Tertiary')}">${d.Tertiary ? d.Tertiary.toFixed(2) + '%' : 'No available data'}</strong>
+                    </div>
+                </div>
+            `);
+        })
+        .on('mousemove', moveTooltip)
+        .on('mouseleave', function () {
+            if (selectedYear === null) {
+                d3.select(this).style('opacity', 0.9);
+            }
+            hideTooltip();
+        })
+        .on('click', function (event, d) {
+            const clickedYear = d.year;
+            
+            if (selectedYear === clickedYear) {
+                selectedYear = null;
+                groups.selectAll('rect')
+                    .transition()
+                    .duration(400)
+                    .ease(d3.easeBackOut)
+                    .attr('y', d => d[d3.select(this.parentNode).selectAll('rect').nodes().indexOf(this) === 0 ? 'Primary' : 
+                        d3.select(this.parentNode).selectAll('rect').nodes().indexOf(this) === 1 ? 'Secondary' : 'Tertiary'] ? 
+                        y(d[d3.select(this.parentNode).selectAll('rect').nodes().indexOf(this) === 0 ? 'Primary' : 
+                        d3.select(this.parentNode).selectAll('rect').nodes().indexOf(this) === 1 ? 'Secondary' : 'Tertiary']) : y(0))
+                    .style('opacity', 0.9);
+                
+                subgroups.forEach(subgroup => {
+                    groups.selectAll(`rect.${subgroup}`)
+                        .transition()
+                        .duration(400)
+                        .ease(d3.easeBackOut)
+                        .attr('y', d => d[subgroup] ? y(d[subgroup]) : y(0))
+                        .attr('height', d => d[subgroup] ? HEIGHT - y(d[subgroup]) : 0)
+                        .style('opacity', 0.9);
+                });
+            } else {
+                selectedYear = clickedYear;
+                
+                subgroups.forEach(subgroup => {
+                    groups.selectAll(`rect.${subgroup}`)
+                        .transition()
+                        .duration(300)
+                        .style('opacity', d => d.year === clickedYear ? 0 : 0.2)
+                        .attr('y', d => d.year === clickedYear ? HEIGHT : (d[subgroup] ? y(d[subgroup]) : y(0)))
+                        .attr('height', d => d.year === clickedYear ? 0 : (d[subgroup] ? HEIGHT - y(d[subgroup]) : 0));
+                });
+                
+                setTimeout(() => {
+                    subgroups.forEach((subgroup, i) => {
+                        groups.selectAll(`rect.${subgroup}`)
+                            .filter(d => d.year === clickedYear)
+                            .transition()
+                            .duration(500)
+                            .delay(i * 100)
+                            .ease(d3.easeBackOut.overshoot(0.5))
+                            .attr('y', d => d[subgroup] ? y(d[subgroup]) : y(0))
+                            .attr('height', d => d[subgroup] ? HEIGHT - y(d[subgroup]) : 0)
+                            .style('opacity', 1);
+                    });
+                }, 300);
+            }
+        });
+
+    function resetAllBars() {
+        if (selectedYear === null) return; 
+        
+        selectedYear = null;
+        
+        subgroups.forEach(subgroup => {
+            groups.selectAll(`rect.${subgroup}`)
+                .transition()
+                .duration(200)
+                .attr('y', HEIGHT)
+                .attr('height', 0)
+                .style('opacity', 0);
+        });
+        
+        setTimeout(() => {
+            subgroups.forEach(subgroup => {
+                groups.selectAll(`rect.${subgroup}`)
+                    .transition()
+                    .duration(800)
+                    .delay((d, i) => years.indexOf(d.year) * 80)
+                    .ease(d3.easeBackOut.overshoot(0.3))
+                    .attr('y', d => d[subgroup] ? y(d[subgroup]) : y(0))
+                    .attr('height', d => d[subgroup] ? HEIGHT - y(d[subgroup]) : 0)
+                    .style('opacity', 0.9);
+            });
+        }, 200);
+    }
+
+    g.insert('rect', ':first-child')
+        .attr('class', 'background-click-area')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', WIDTH)
+        .attr('height', HEIGHT)
+        .attr('fill', 'transparent')
+        .style('cursor', 'pointer')
+        .on('click', function (event) {
+            if (event.target === this) {
+                resetAllBars();
+            }
+        });
 
     g.append('text')
         .attr('x', WIDTH / 2)
