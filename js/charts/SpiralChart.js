@@ -204,11 +204,20 @@ export function renderSpiralChart(container, datasets) {
         })
         .style('cursor', 'pointer')
         .style('opacity', 0)
+        .attr('transform', function(d) {
+            const yearIndex = years.indexOf(d.year);
+            const radius = radiusScale(yearIndex);
+            const angle = angleScale(d.month) - Math.PI / 2;
+            const cx = radius * Math.cos(angle);
+            const cy = radius * Math.sin(angle);
+            return `translate(${cx * 0.1}, ${cy * 0.1}) scale(0.8)`;
+        })
         .transition()
-        .duration(150)
-        .delay((d, i) => i * 25)
-        .ease(d3.easeCubicOut)
-        .style('opacity', 1);
+        .duration(80)
+        .delay((d, i) => i * 12)
+        .ease(d3.easeLinear)
+        .style('opacity', 1)
+        .attr('transform', 'translate(0, 0) scale(1)');
 
     g.selectAll('path.segment')
         .on('mouseover', function (event, datum) {
@@ -233,26 +242,25 @@ export function renderSpiralChart(container, datasets) {
                 
                 g.selectAll('path.segment')
                     .transition()
-                    .duration(200)
+                    .duration(100)
                     .style('opacity', 0);
                 
                 setTimeout(() => {
                     g.selectAll('path.segment')
                         .filter(datum => `${datum.year}-${datum.month}` !== clickedKey)
                         .transition()
-                        .duration(150)
-                        .delay((d, i) => i * 25)
-                        .ease(d3.easeCubicOut)
+                        .duration(80)
+                        .delay((d, i) => i * 8)
+                        .ease(d3.easeLinear)
                         .style('opacity', 0.15);
                     
                     g.selectAll('path.segment')
                         .filter(datum => `${datum.year}-${datum.month}` === clickedKey)
                         .transition()
-                        .duration(500)
-                        .delay(clickedIndex * 25)
+                        .duration(300)
                         .ease(d3.easeBackOut.overshoot(0.5))
                         .style('opacity', 1);
-                }, 200);
+                }, 100);
             }
         });
 
@@ -263,17 +271,17 @@ export function renderSpiralChart(container, datasets) {
         
         g.selectAll('path.segment')
             .transition()
-            .duration(200)
+            .duration(100)
             .style('opacity', 0);
         
         setTimeout(() => {
             g.selectAll('path.segment')
                 .transition()
-                .duration(150)
-                .delay((d, i) => i * 25)
-                .ease(d3.easeCubicOut)
+                .duration(80)
+                .delay((d, i) => i * 12)
+                .ease(d3.easeLinear)
                 .style('opacity', 1);
-        }, 200);
+        }, 100);
     }
 
     years.filter((_, i) => i % 3 === 0 || i === numYears - 1).forEach((year, idx) => {
