@@ -286,22 +286,22 @@ export function renderAlluvional(container, datasets) {
                 nodeGroup.selectAll('g.node').transition().duration(200).style('opacity', 1);
                 hideTooltip();
             })
-            .on('click', function(event, d) {
+            .on('click', function (event, d) {
                 event.stopPropagation();
-                
+
                 const linkKey = `link_${d.source.id}_${d.target.id}`;
-                
+
                 if (selectedNode === linkKey) {
                     animateResetLeftToRight();
                 } else {
                     selectedNode = linkKey;
-                    
+
                     const pathToSource = findPathToNode(d.source.id);
                     const pathFromTarget = findAllLinksFromNode(d.target.id);
-                    
+
                     const connectedLinks = new Set([d, ...pathToSource.links, ...pathFromTarget.links]);
                     const connectedNodes = new Set([d.source.id, d.target.id, ...pathToSource.nodes, ...pathFromTarget.nodes]);
-                    
+
                     animateHighlightLeftToRight(connectedLinks, connectedNodes);
                 }
             });
@@ -328,7 +328,7 @@ export function renderAlluvional(container, datasets) {
         const findAllLinksFromNode = (nodeId) => {
             const connectedLinks = new Set();
             const connectedNodes = new Set([nodeId]);
-            
+
             const traverse = (currentId) => {
                 sankeyData.links.forEach(l => {
                     if (l.source.id === currentId && !connectedLinks.has(l)) {
@@ -345,7 +345,7 @@ export function renderAlluvional(container, datasets) {
         const findPathToNode = (nodeId) => {
             const connectedLinks = new Set();
             const connectedNodes = new Set([nodeId]);
-            
+
             const traverseBack = (currentId) => {
                 sankeyData.links.forEach(l => {
                     if (l.target.id === currentId && !connectedLinks.has(l)) {
@@ -365,7 +365,7 @@ export function renderAlluvional(container, datasets) {
                 .duration(400)
                 .ease(d3.easeCubicOut)
                 .attr('stroke-opacity', 0.06);
-            
+
             nodeGroup.selectAll('g.node')
                 .transition()
                 .duration(400)
@@ -408,7 +408,7 @@ export function renderAlluvional(container, datasets) {
                 .duration(300)
                 .ease(d3.easeCubicOut)
                 .attr('stroke-opacity', 0);
-            
+
             nodeGroup.selectAll('g.node')
                 .transition()
                 .duration(300)
@@ -440,14 +440,14 @@ export function renderAlluvional(container, datasets) {
 
         const handleNodeClick = (event, d) => {
             event.stopPropagation();
-            
+
             const clickedKey = d.id;
-            
+
             if (selectedNode === clickedKey) {
                 animateResetLeftToRight();
             } else {
                 selectedNode = clickedKey;
-                
+
                 let result;
                 if (d.level === 0) {
                     result = findAllLinksFromNode(d.id);
@@ -461,17 +461,22 @@ export function renderAlluvional(container, datasets) {
                         nodes: new Set([...fromNode.nodes, ...toNode.nodes])
                     };
                 }
-                
+
                 animateHighlightLeftToRight(result.links, result.nodes);
             }
         };
 
         g.select('.background-click')
-            .on('click', function(event) {
+            .on('click', function (event) {
                 if (selectedNode !== null) {
                     animateResetLeftToRight();
+                    hideTooltip();
                 }
             });
+
+        svg.on('mouseleave', function () {
+            hideTooltip();
+        });
 
         const showNodeTooltip = (event, d) => {
             const totalValue = d.value || 0;
