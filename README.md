@@ -17,7 +17,7 @@ The project was developed as part of the **Data Visualization** course at the Un
 ## Analytical Objectives
 
 The dashboard answers critical questions through data analysis:
-1.  **Demographic Impact:** How does war affect birth and mortality projections until 2100?
+1.  **Demographic Impact:** How does war affect birth and mortality projections until 2030?
 2.  **Economic Crisis:** What is the relationship between political instability and inflation of essential goods?
 3.  **Social Deterioration:** How have enrollment rates and child mortality changed since the conflict began?
 4.  **Media Bias:** Does global interest (Google Trends) reflect the actual severity of field events (ACLED)?
