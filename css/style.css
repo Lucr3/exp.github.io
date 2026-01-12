@@ -1257,7 +1257,7 @@ footer {
     }
 
     .nav-links.active {
-        max-height: 500px;
+        max-height: 700px;
         padding: var(--spacing-md) 0;
     }
 
