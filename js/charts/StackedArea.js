@@ -149,10 +149,7 @@ export function renderStackedArea(container, datasets) {
                 .attr('stroke', textColor).attr('stroke-width', 1.5)
                 .attr('stroke-dasharray', '6,4').attr('opacity', 0.5);
 
-            g.append('text')
-                .attr('x', xScale(CURRENT_YEAR) + 5).attr('y', 15)
-                .style('font-size', '10px').style('fill', textMuted)
-                .text('2024');
+
         }
 
 
